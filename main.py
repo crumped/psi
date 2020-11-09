@@ -1,4 +1,4 @@
-import wpowadzenie1
+from zadania import wpowadzenie1
 
 if __name__ == '__main__':
     wpowadzenie1.zad13()
