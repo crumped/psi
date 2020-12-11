@@ -8,70 +8,15 @@
 from django.db import models
 
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150)
+class BinTrack(models.Model):
+    id_bin_track = models.IntegerField(primary_key=True)
+    bin = models.ForeignKey('TrashBin', models.DO_NOTHING, blank=True, null=True)
+    track = models.ForeignKey('Track', models.DO_NOTHING, blank=True, null=True)
+    stop_number = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.IntegerField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.IntegerField()
-    is_active = models.IntegerField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
-
-
-class AuthUserGroups(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+        db_table = 'bin_track'
 
 
 class CarGps(models.Model):
@@ -83,19 +28,6 @@ class CarGps(models.Model):
     class Meta:
         managed = False
         db_table = 'car_gps'
-
-
-class CarStops(models.Model):
-    id_car_stops = models.AutoField(primary_key=True)
-    order = models.IntegerField(blank=True, null=True)
-    car = models.ForeignKey('Cars', models.DO_NOTHING, blank=True, null=True)
-    bin = models.ForeignKey('TrashBin', models.DO_NOTHING, blank=True, null=True)
-    arrival_date = models.DateTimeField(blank=True, null=True)
-    is_done = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'car_stops'
 
 
 class CarType(models.Model):
@@ -111,65 +43,51 @@ class Cars(models.Model):
     id_cars = models.AutoField(primary_key=True)
     number_plate = models.CharField(max_length=45, blank=True, null=True)
     car_type = models.ForeignKey(CarType, models.DO_NOTHING, db_column='car_type', blank=True, null=True)
+    mileage = models.IntegerField(blank=True, null=True)
+    date_oil = models.DateField(blank=True, null=True)
+    mileage_oil = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'cars'
 
 
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.PositiveSmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoMigrations(models.Model):
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
-
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_session'
-
-
 class GarbageDump(models.Model):
     id_garbage_dump = models.AutoField(primary_key=True)
     address_gps = models.TextField(blank=True, null=True)  # This field type is a guess.
     address = models.CharField(max_length=45, blank=True, null=True)
-    car = models.ForeignKey(Cars, models.DO_NOTHING, blank=True, null=True)
+    category = models.CharField(max_length=7, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'garbage_dump'
+
+
+class Invoices(models.Model):
+    id_invoices = models.IntegerField(primary_key=True)
+    number = models.IntegerField(blank=True, null=True)
+    date_of_invoice = models.DateTimeField(blank=True, null=True)
+    date_of_service = models.DateTimeField(blank=True, null=True)
+    name_of_service = models.CharField(max_length=100, blank=True, null=True)
+    number_of_items = models.IntegerField(blank=True, null=True)
+    price_netto = models.IntegerField(blank=True, null=True)
+    full_price_netto = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'invoices'
+
+
+class InvoicesNames(models.Model):
+    id_invoices_names = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    adress = models.CharField(max_length=100, blank=True, null=True)
+    nip = models.IntegerField(blank=True, null=True)
+    invoices = models.ForeignKey(Invoices, models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'invoices_names'
 
 
 class ReportProblem(models.Model):
@@ -186,11 +104,28 @@ class ReportProblem(models.Model):
         db_table = 'report_problem'
 
 
+class Track(models.Model):
+    id_track = models.AutoField(primary_key=True)
+    arrival_date = models.DateTimeField(blank=True, null=True)
+    is_done = models.IntegerField(blank=True, null=True)
+    car = models.ForeignKey(Cars, models.DO_NOTHING, blank=True, null=True)
+    driver = models.IntegerField(blank=True, null=True)
+    manager = models.IntegerField(blank=True, null=True)
+    date_of_loan_keys = models.DateTimeField(blank=True, null=True)
+    date_return_keys = models.DateTimeField(blank=True, null=True)
+    garbage_dump = models.ForeignKey(GarbageDump, models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'track'
+
+
 class TrashBin(models.Model):
     id_trash_bin = models.AutoField(primary_key=True)
     bin_capacity = models.CharField(max_length=45, blank=True, null=True)
     bin_type = models.CharField(max_length=45, blank=True, null=True)
     address = models.CharField(max_length=45, blank=True, null=True)
+    bin_size = models.CharField(max_length=5, blank=True, null=True)
 
     class Meta:
         managed = False
