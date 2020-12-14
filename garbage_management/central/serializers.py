@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User
 
 
-class BinTrack(serializers.ModelSerializer):
+class BinTrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BinTrack
@@ -10,7 +11,7 @@ class BinTrack(serializers.ModelSerializer):
         read_only_fields = ('id_bin_track',)
 
 
-class CarGps(serializers.ModelSerializer):
+class CarGpsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarGps
@@ -18,7 +19,7 @@ class CarGps(serializers.ModelSerializer):
         read_only_fields = ('id_car_gps',)
 
 
-class CarType(serializers.ModelSerializer):
+class CarTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarType
@@ -26,7 +27,7 @@ class CarType(serializers.ModelSerializer):
         read_only_fields = ('id_car_type',)
 
 
-class Cars(serializers.ModelSerializer):
+class CarsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cars
@@ -34,7 +35,7 @@ class Cars(serializers.ModelSerializer):
         read_only_fields = ('id_cars',)
 
 
-class GarbageDump(serializers.ModelSerializer):
+class GarbageDumpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GarbageDump
@@ -42,7 +43,7 @@ class GarbageDump(serializers.ModelSerializer):
         read_only_fields = ('id_garbage_dump',)
 
 
-class Invoices(serializers.ModelSerializer):
+class InvoicesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invoices
@@ -50,7 +51,7 @@ class Invoices(serializers.ModelSerializer):
         read_only_fields = ('id_invoices',)
 
 
-class InvoicesNames(serializers.ModelSerializer):
+class InvoicesNamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvoicesNames
@@ -58,7 +59,7 @@ class InvoicesNames(serializers.ModelSerializer):
         read_only_fields = ('id_invoices_names',)
 
 
-class ReportProblem(serializers.ModelSerializer):
+class ReportProblemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReportProblem
@@ -66,7 +67,7 @@ class ReportProblem(serializers.ModelSerializer):
         read_only_fields = ('id_report_problem',)
 
 
-class Track(serializers.ModelSerializer):
+class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
@@ -74,9 +75,19 @@ class Track(serializers.ModelSerializer):
         read_only_fields = ('id_track',)
 
 
-class TrashBin(serializers.ModelSerializer):
+class TrashBinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrashBin
         fields = '__all__'
         read_only_fields = ('id_trash_bin',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',
+                  'is_active', 'is_staff', 'is_superuser', 'date_joined', 'groups',)
+        read_only_fields = ('username', 'auth_token', 'date_joined', 'groups',)

@@ -41,7 +41,7 @@ class CarType(models.Model):
 
 class Cars(models.Model):
     id_cars = models.AutoField(primary_key=True)
-    number_plate = models.CharField(max_length=45, blank=True, null=True)
+    number_plate = models.CharField(max_length=45, blank=False, null=False)
     car_type = models.ForeignKey(CarType, models.DO_NOTHING, db_column='car_type', blank=True, null=True)
     mileage = models.IntegerField(blank=True, null=True)
     date_oil = models.DateField(blank=True, null=True)
