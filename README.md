@@ -1,2 +1,2 @@
 # Model bazy danych
-![Screenshot](database_model/garbage_disposal_system.png)
+![Screenshot](database_model/garbage_disposal_system_v2.png)
