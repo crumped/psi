@@ -6,7 +6,7 @@ from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Cars, TrashBin, GarbageDump
-from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer
+from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer
 from django.contrib.auth.models import User
 
 
@@ -205,6 +205,59 @@ class UsersView(APIView):
             users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array)
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
+
+
+    def post(self, request, format=None):
+
+        current_user = User.objects.all().filter(username=request.user).first()
+        serializer = UserSerializer(current_user)
+        if 'szef' in serializer.data['groups']:
+            available_groups = ['kierowca-smieciarki', 'kierownik-glowny', 'kierownik-przewozu-smieci',
+                                'kierownik-wysypiska', 'ksiegowosc', 'pracownicy-przewozacy-smieci',
+                                'pracownik-wysypiska', 'szef']
+            serializer2 = UserModifySerializer(data=request.data)
+            if serializer2.is_valid():
+                print(serializer2.validated_data)
+                if serializer2.validated_data['groups'] not in available_groups:
+                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                serializer2.save()
+                return Response(serializer2.data)
+            return Response(serializer2.errors)
+
+        if 'kierownik-glowny' in serializer.data['groups']:
+            available_groups = ['kierowca-smieciarki', 'kierownik-glowny', 'kierownik-przewozu-smieci',
+                                'kierownik-wysypiska', 'ksiegowosc', 'pracownicy-przewozacy-smieci',
+                                'pracownik-wysypiska']
+            serializer2 = UserModifySerializer(data=request.data)
+            if serializer2.is_valid():
+                print(serializer2.validated_data)
+                if serializer2.validated_data['groups'] not in available_groups:
+                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                serializer2.save()
+                return Response(serializer2.data)
+            return Response(serializer2.errors)
+
+        if 'kierownik-przewozu-smieci' in serializer.data['groups']:
+            available_groups = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+            serializer2 = UserModifySerializer(data=request.data)
+            if serializer2.is_valid():
+                print(serializer2.validated_data)
+                if serializer2.validated_data['groups'] not in available_groups:
+                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                serializer2.save()
+                return Response(serializer2.data)
+            return Response(serializer2.errors)
+
+        if 'kierownik-wysypiska' in serializer.data['groups']:
+            available_groups = ['pracownik-wysypiska']
+            serializer2 = UserModifySerializer(data=request.data)
+            if serializer2.is_valid():
+                print(serializer2.validated_data)
+                if serializer2.validated_data['groups'] not in available_groups:
+                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                serializer2.save()
+                return Response(serializer2.data)
+            return Response(serializer2.errors)
 
 
 class UserDetailsView(APIView):

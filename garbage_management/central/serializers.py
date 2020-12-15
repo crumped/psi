@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 
 class BinTrackSerializer(serializers.ModelSerializer):
@@ -91,3 +91,24 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
                   'is_active', 'is_staff', 'is_superuser', 'date_joined', 'groups',)
         read_only_fields = ('username', 'auth_token', 'date_joined', 'groups',)
+
+
+class UserModifySerializer(serializers.ModelSerializer):
+    groups = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'groups', 'password')
+        read_only_fields = ('auth_token', 'date_joined')
+        extra_kwargs = {'password': {'write_only': True}, 'groups': {'write_only': True}}
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        validated_data['is_active'] = 1
+        group = validated_data.pop('groups')
+        user = User(**validated_data)
+        user.set_password(password)
+        g = Group.objects.get(name=group)
+        user.save()
+        user.groups.add(g)
+        return user
