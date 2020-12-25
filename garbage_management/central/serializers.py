@@ -90,7 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
                   'is_active', 'is_staff', 'is_superuser', 'date_joined', 'groups',)
-        read_only_fields = ('username', 'auth_token', 'date_joined', 'groups',)
+        read_only_fields = ('username', 'auth_token', 'date_joined', 'groups', 'is_staff', 'is_superuser',)
 
 
 class UserModifySerializer(serializers.ModelSerializer):

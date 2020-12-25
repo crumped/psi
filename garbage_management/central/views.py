@@ -167,16 +167,11 @@ class GarbageDumpView(APIView):
 class UsersView(APIView):
     """
     View to list all users in the system.
-
-    * Requires token authentication.
-    * Only admin users are able to access this view.
     """
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
-        'POST': ['kps', 'someMadeUpGroup'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'POST': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
     }
 
     def get(self, request, format=None):
@@ -208,7 +203,6 @@ class UsersView(APIView):
 
 
     def post(self, request, format=None):
-
         current_user = User.objects.all().filter(username=request.user).first()
         serializer = UserSerializer(current_user)
         if 'szef' in serializer.data['groups']:
@@ -261,4 +255,121 @@ class UsersView(APIView):
 
 
 class UserDetailsView(APIView):
-    pass
+    """
+       View to list all users in the system.
+       """
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+        'PUT': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+        'DELETE': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+    }
+
+    def get(self, request, pk, format=None):
+        current_user = User.objects.all().filter(username=request.user).first()
+        serializer = UserSerializer(current_user)
+        if 'szef' in serializer.data['groups']:
+            users = User.objects.get(pk=pk, is_superuser=False, )
+            serializer = UserSerializer(users)
+            return Response(serializer.data)
+
+        if 'kierownik-glowny' in serializer.data['groups']:
+            exclude_array = ['szef']
+            users = User.objects.filter(pk=pk, is_superuser=False).exclude(groups__name__in=exclude_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users)
+            return Response(serializer.data)
+
+        if 'kierownik-przewozu-smieci' in serializer.data['groups']:
+            include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users)
+            return Response(serializer.data)
+
+        if 'kierownik-wysypiska' in serializer.data['groups']:
+            include_array = ['pracownik-wysypiska']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users)
+            return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        current_user = User.objects.all().filter(username=request.user).first()
+        serializer = UserSerializer(current_user)
+        if 'szef' in serializer.data['groups']:
+            users = User.objects.get(pk=pk, is_superuser=False, )
+            serializer = UserSerializer(users, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'kierownik-glowny' in serializer.data['groups']:
+            exclude_array = ['szef']
+            users = User.objects.filter(pk=pk, is_superuser=False).exclude(groups__name__in=exclude_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'kierownik-przewozu-smieci' in serializer.data['groups']:
+            include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'kierownik-wysypiska' in serializer.data['groups']:
+            include_array = ['pracownik-wysypiska']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            serializer = UserSerializer(users, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        current_user = User.objects.all().filter(username=request.user).first()
+        serializer = UserSerializer(current_user)
+        if 'szef' in serializer.data['groups']:
+            users = User.objects.get(pk=pk, is_superuser=False, )
+            users.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if 'kierownik-glowny' in serializer.data['groups']:
+            exclude_array = ['szef']
+            users = User.objects.filter(pk=pk, is_superuser=False).exclude(groups__name__in=exclude_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            users.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if 'kierownik-przewozu-smieci' in serializer.data['groups']:
+            include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            users.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if 'kierownik-wysypiska' in serializer.data['groups']:
+            include_array = ['pracownik-wysypiska']
+            users = User.objects.filter(pk=pk, is_superuser=False, groups__name__in=include_array).first()
+            if not users:
+                return Response({"error": "users doesn't exist or you don't have permissions"})
+            users.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
