@@ -71,9 +71,9 @@ class Invoices(models.Model):
 class InvoicesNames(models.Model):
     id_invoices_names = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
-    adress = models.CharField(max_length=100, blank=True, null=True)
+    address = models.CharField(max_length=100, blank=True, null=True)
     nip = models.IntegerField(blank=True, null=True)
-    invoices = models.ForeignKey(Invoices, models.DO_NOTHING, blank=True, null=True)
+    invoices = models.ForeignKey(Invoices, models.DO_NOTHING, related_name='invoices', blank=True, null=True)
 
     class Meta:
         managed = False

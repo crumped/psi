@@ -5,8 +5,10 @@ from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys
-from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer
+from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys, Invoices, InvoicesNames
+from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer,\
+    UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer, InvoicesSerializer, \
+    InvoicesNamesSerializer
 from django.contrib.auth.models import User
 
 
@@ -487,10 +489,16 @@ class InvoicesView(APIView):
     }
 
     def get(self, request, format=None):
-        pass
+        invoices = Invoices.objects.all()
+        serializer = InvoicesSerializer(invoices, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        pass
+        serializer = InvoicesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
 class InvoicesDetailsView(APIView):
@@ -502,13 +510,63 @@ class InvoicesDetailsView(APIView):
     }
 
     def get(self, request, pk, format=None):
-        pass
+        invoices = Invoices.objects.get(pk=pk)
+        serializer = InvoicesSerializer(invoices)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
-        pass
+        invoices = Invoices.objects.get(pk=pk)
+        serializer = InvoicesSerializer(invoices, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        pass
+        invoices = Invoices.objects.get(pk=pk)
+        invoices.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class InvoicesNamesView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['__all__'],
+    }
+
+    def get(self, request, format=None):
+        invoices = InvoicesNames.objects.all()
+        serializer = InvoicesNamesSerializer(invoices, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer = InvoicesNamesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class InvoicesNamesDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'PUT': ['__all__'],
+    }
+
+    def get(self, request, pk, format=None):
+        invoices = InvoicesNames.objects.get(pk=pk)
+        serializer = InvoicesNamesSerializer(invoices)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        invoices = InvoicesNames.objects.get(pk=pk)
+        serializer = InvoicesNamesSerializer(invoices, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ScheduleView(APIView):

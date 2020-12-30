@@ -43,20 +43,23 @@ class KeysSerializer(serializers.ModelSerializer):
         read_only_fields = ('id_keys',)
 
 
-class InvoicesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Invoices
-        fields = '__all__'
-        read_only_fields = ('id_invoices',)
-
-
 class InvoicesNamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvoicesNames
         fields = '__all__'
         read_only_fields = ('id_invoices_names',)
+
+
+class InvoicesSerializer(serializers.ModelSerializer):
+    invoices = InvoicesNamesSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Invoices
+        fields = '__all__'
+        read_only_fields = ('id_invoices',)
+
+    depth = 1
 
 
 class TrackSerializer(serializers.ModelSerializer):

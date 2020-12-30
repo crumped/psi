@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import index, CarsView, CarDetailsView, TrashBinDetailsView, TrashBinsView, UsersView, UserDetailsView,\
-    TrackView, TrackDetailsView, BinTrackView, BinTrackDetailsView, KeysView, KeysDetailsView
+    TrackView, TrackDetailsView, BinTrackView, BinTrackDetailsView, KeysView, KeysDetailsView, InvoicesView, \
+    InvoicesDetailsView, InvoicesNamesView, InvoicesNamesDetailsView
 
 urlpatterns = [
     path('', index, name="mainview"),
@@ -16,4 +17,8 @@ urlpatterns = [
     path('stops/<int:pk>', BinTrackDetailsView.as_view(), name="stops details"),
     path('keys/', KeysView.as_view(), name="keys"),
     path('keys/<int:pk>', KeysDetailsView.as_view(), name="keys details"),
+    path('invoices/', InvoicesView.as_view(), name="invoices"),
+    path('invoices/<int:pk>', InvoicesDetailsView.as_view(), name="invoices details"),
+    path('invoices-names/', InvoicesNamesView.as_view(), name="invoices names"),
+    path('invoices-names/<int:pk>', InvoicesNamesDetailsView.as_view(), name="invoices names details"),
 ]
