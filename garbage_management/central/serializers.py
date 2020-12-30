@@ -52,11 +52,14 @@ class InvoicesNamesSerializer(serializers.ModelSerializer):
 
 
 class TrackSerializer(serializers.ModelSerializer):
+    stops = BinTrackSerializer(many=True, read_only=True)
 
     class Meta:
         model = Track
         fields = '__all__'
         read_only_fields = ('id_track',)
+
+    depth = 1
 
 
 class TrashBinSerializer(serializers.ModelSerializer):

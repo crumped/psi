@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cars, TrashBin, GarbageDump, Track
-from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer
+from .models import Cars, TrashBin, GarbageDump, Track, BinTrack
+from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer, BinTrackSerializer
 from django.contrib.auth.models import User
 
 
@@ -433,15 +433,21 @@ class BinTrackView(APIView):
     }
 
     def get(self, request, format=None):
-        # TODO
-        # get int track_id
-        # get list of stops on the track
-        pass
+        track_id = request.query_params.get('track-id', None)
+        if track_id is not None:
+            print(track_id)
+            tracks = BinTrack.objects.all().filter(track=track_id)
+            serializer = BinTrackSerializer(tracks, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"missing track-id parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
-        # TODO
-        # add new stop to the track
-        pass
+        serializer = BinTrackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BinTrackDetailsView(APIView):
@@ -454,19 +460,22 @@ class BinTrackDetailsView(APIView):
     }
 
     def get(self, request, pk, format=None):
-        # TODO
-        # get stop id
-        pass
+        bin_track = BinTrack.objects.get(pk=pk)
+        serializer = BinTrackSerializer(bin_track)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
-        # TODO
-        # update the stop
-        pass
+        bin_track = BinTrack.objects.get(pk=pk)
+        serializer = BinTrackSerializer(bin_track, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        # TODO
-        # delete the stop
-        pass
+        bin_track = BinTrack.objects.get(pk=pk)
+        bin_track.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class InvoicesView(APIView):
@@ -529,3 +538,7 @@ class ScheduleDetailsView(APIView):
 
     def delete(self, request, pk, format=None):
         pass
+
+
+class Keys(APIView):
+    pass

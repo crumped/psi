@@ -10,9 +10,9 @@ from django.contrib.auth.models import User
 
 
 class BinTrack(models.Model):
-    id_bin_track = models.IntegerField(primary_key=True)
+    id_bin_track = models.AutoField(primary_key=True)
     bin = models.ForeignKey('TrashBin', models.DO_NOTHING, blank=True, null=True)
-    track = models.ForeignKey('Track', models.DO_NOTHING, blank=True, null=True)
+    track = models.ForeignKey('Track', models.DO_NOTHING, related_name='stops', blank=True, null=False)
     stop_number = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -108,8 +108,6 @@ class Track(models.Model):
     car = models.ForeignKey(Cars, models.DO_NOTHING, blank=True, null=True)
     driver = models.IntegerField(blank=True, null=True)
     manager = models.IntegerField(blank=True, null=True)
-    date_of_loan_keys = models.DateTimeField(blank=True, null=True)
-    date_return_keys = models.DateTimeField(blank=True, null=True)
     garbage_dump = models.ForeignKey(GarbageDump, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
