@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cars, TrashBin, GarbageDump
-from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer
+from .models import Cars, TrashBin, GarbageDump, Track
+from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer
 from django.contrib.auth.models import User
 
 
@@ -104,7 +104,7 @@ class TrashBinsView(APIView):
 
     def get(self, request, format=None):
         trash_bins = TrashBin.objects.all()
-        serializer = CarsSerializer(trash_bins, many=True)
+        serializer = TrashBinSerializer(trash_bins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
@@ -373,3 +373,159 @@ class UserDetailsView(APIView):
             users.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class TrackView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+    }
+
+    def get(self, request, format=None):
+        # TODO
+        # get a list of tracks
+        tracks = Track.objects.all()
+        serializer = TrackSerializer(tracks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        # TODO
+        # create a new track
+        serializer = TrackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TrackDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, pk, format=None):
+        track = Track.objects.get(pk=pk)
+        serializer = TrackSerializer(track)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        track = Track.objects.get(pk=pk)
+        serializer = TrackSerializer(track, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        track = Track.objects.get(pk=pk)
+        track.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BinTrackView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+    }
+
+    def get(self, request, format=None):
+        # TODO
+        # get int track_id
+        # get list of stops on the track
+        pass
+
+    def post(self, request, format=None):
+        # TODO
+        # add new stop to the track
+        pass
+
+
+class BinTrackDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, pk, format=None):
+        # TODO
+        # get stop id
+        pass
+
+    def put(self, request, pk, format=None):
+        # TODO
+        # update the stop
+        pass
+
+    def delete(self, request, pk, format=None):
+        # TODO
+        # delete the stop
+        pass
+
+
+class InvoicesView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class InvoicesDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, pk, format=None):
+        pass
+
+    def put(self, request, pk, format=None):
+        pass
+
+    def delete(self, request, pk, format=None):
+        pass
+
+
+class ScheduleView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class ScheduleDetailsView(APIView):
+    def get(self, request, pk, format=None):
+        pass
+
+    def put(self, request, pk, format=None):
+        pass
+
+    def delete(self, request, pk, format=None):
+        pass

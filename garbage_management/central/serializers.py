@@ -11,14 +11,6 @@ class BinTrackSerializer(serializers.ModelSerializer):
         read_only_fields = ('id_bin_track',)
 
 
-class CarGpsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CarGps
-        fields = '__all__'
-        read_only_fields = ('id_car_gps',)
-
-
 class CarTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -57,14 +49,6 @@ class InvoicesNamesSerializer(serializers.ModelSerializer):
         model = InvoicesNames
         fields = '__all__'
         read_only_fields = ('id_invoices_names',)
-
-
-class ReportProblemSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ReportProblem
-        fields = '__all__'
-        read_only_fields = ('id_report_problem',)
 
 
 class TrackSerializer(serializers.ModelSerializer):
