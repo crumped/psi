@@ -1,3 +1,5 @@
+import datetime
+
 from django.http import Http404
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
@@ -5,10 +7,10 @@ from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys, Invoices, InvoicesNames
+from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys, Invoices, InvoicesNames, Schedule
 from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer,\
     UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer, InvoicesSerializer, \
-    InvoicesNamesSerializer
+    InvoicesNamesSerializer, ScheduleSerializer
 from django.contrib.auth.models import User
 
 
@@ -577,10 +579,17 @@ class ScheduleView(APIView):
     }
 
     def get(self, request, format=None):
-        pass
+        this_month = datetime.datetime.now().month
+        schedule = Schedule.objects.all().filter(day__month=this_month)
+        serializer = ScheduleSerializer(schedule, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        pass
+        serializer = ScheduleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ScheduleDetailsView(APIView):
@@ -592,13 +601,22 @@ class ScheduleDetailsView(APIView):
     }
 
     def get(self, request, pk, format=None):
-        pass
+        schedule = Schedule.objects.get(pk=pk)
+        serializer = ScheduleSerializer(schedule)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
-        pass
+        schedule = Schedule.objects.get(pk=pk)
+        serializer = ScheduleSerializer(schedule, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        pass
+        schedule = Schedule.objects.get(pk=pk)
+        schedule.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class KeysView(APIView):

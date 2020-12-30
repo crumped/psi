@@ -62,6 +62,14 @@ class InvoicesSerializer(serializers.ModelSerializer):
     depth = 1
 
 
+class ScheduleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Schedule
+        fields = '__all__'
+        read_only_fields = ('id_schedule',)
+
+
 class TrackSerializer(serializers.ModelSerializer):
     stops = BinTrackSerializer(many=True, read_only=True)
 
