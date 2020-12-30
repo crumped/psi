@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Cars, TrashBin, GarbageDump, Track, BinTrack
-from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer, BinTrackSerializer
+from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys
+from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer, UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer
 from django.contrib.auth.models import User
 
 
@@ -454,7 +454,6 @@ class BinTrackDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
         'PUT': ['__all__'],
         'DELETE': ['kps'],
     }
@@ -498,7 +497,6 @@ class InvoicesDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
         'PUT': ['__all__'],
         'DELETE': ['kps'],
     }
@@ -518,8 +516,6 @@ class ScheduleView(APIView):
     required_groups = {
         'GET': ['kps', 'members'],
         'POST': ['kps', 'someMadeUpGroup'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
     }
 
     def get(self, request, format=None):
@@ -530,6 +526,13 @@ class ScheduleView(APIView):
 
 
 class ScheduleDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
     def get(self, request, pk, format=None):
         pass
 
@@ -540,5 +543,48 @@ class ScheduleDetailsView(APIView):
         pass
 
 
-class Keys(APIView):
-    pass
+class KeysView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'POST': ['kps', 'someMadeUpGroup'],
+    }
+
+    def get(self, request, format=None):
+        keys = Keys.objects.all()
+        serializer = KeysSerializer(keys, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer =KeysSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class KeysDetailsView(APIView):
+    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+    required_groups = {
+        'GET': ['kps', 'members'],
+        'PUT': ['__all__'],
+        'DELETE': ['kps'],
+    }
+
+    def get(self, request, pk, format=None):
+        keys = Keys.objects.get(pk=pk)
+        serializer = KeysSerializer(keys)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        keys = Keys.objects.get(pk=pk)
+        serializer = KeysSerializer(keys, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        keys = Keys.objects.get(pk=pk)
+        keys.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

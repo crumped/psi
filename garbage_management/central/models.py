@@ -54,7 +54,7 @@ class GarbageDump(models.Model):
 
 
 class Invoices(models.Model):
-    id_invoices = models.IntegerField(primary_key=True)
+    id_invoices = models.AutoField(primary_key=True)
     number = models.IntegerField(blank=True, null=True)
     date_of_invoice = models.DateTimeField(blank=True, null=True)
     date_of_service = models.DateTimeField(blank=True, null=True)
@@ -69,7 +69,7 @@ class Invoices(models.Model):
 
 
 class InvoicesNames(models.Model):
-    id_invoices_names = models.IntegerField(primary_key=True)
+    id_invoices_names = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     adress = models.CharField(max_length=100, blank=True, null=True)
     nip = models.IntegerField(blank=True, null=True)
@@ -81,17 +81,17 @@ class InvoicesNames(models.Model):
 
 
 class Keys(models.Model):
-    id_keys = models.IntegerField(primary_key=True)
+    id_keys = models.AutoField(primary_key=True)
     driver = models.ForeignKey(User, models.DO_NOTHING, db_column='driver', related_name="driver", blank=True, null=True)
     supervisor = models.ForeignKey(User, models.DO_NOTHING, db_column='supervisor', related_name="supervisor", blank=True, null=True)
-    car = models.ForeignKey(Cars, models.DO_NOTHING, db_column='car', blank=True, null=True)
+    car = models.ForeignKey(Cars, models.DO_NOTHING, db_column='car_id', blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'keys'
 
 
 class Schedule(models.Model):
-    id_schedule = models.IntegerField(primary_key=True)
+    id_schedule = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
     day = models.DateField(blank=True, null=True)
     work_type = models.CharField(max_length=10, blank=True, null=True)

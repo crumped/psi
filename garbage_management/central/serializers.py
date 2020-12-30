@@ -35,6 +35,14 @@ class GarbageDumpSerializer(serializers.ModelSerializer):
         read_only_fields = ('id_garbage_dump',)
 
 
+class KeysSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Keys
+        fields = '__all__'
+        read_only_fields = ('id_keys',)
+
+
 class InvoicesSerializer(serializers.ModelSerializer):
 
     class Meta:
