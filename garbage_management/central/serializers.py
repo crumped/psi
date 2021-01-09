@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User, Group
 
 
-class BinTrack(serializers.ModelSerializer):
+class BinTrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BinTrack
@@ -10,15 +11,7 @@ class BinTrack(serializers.ModelSerializer):
         read_only_fields = ('id_bin_track',)
 
 
-class CarGps(serializers.ModelSerializer):
-
-    class Meta:
-        model = CarGps
-        fields = '__all__'
-        read_only_fields = ('id_car_gps',)
-
-
-class CarType(serializers.ModelSerializer):
+class CarTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarType
@@ -26,7 +19,7 @@ class CarType(serializers.ModelSerializer):
         read_only_fields = ('id_car_type',)
 
 
-class Cars(serializers.ModelSerializer):
+class CarsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cars
@@ -34,7 +27,7 @@ class Cars(serializers.ModelSerializer):
         read_only_fields = ('id_cars',)
 
 
-class GarbageDump(serializers.ModelSerializer):
+class GarbageDumpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GarbageDump
@@ -42,15 +35,15 @@ class GarbageDump(serializers.ModelSerializer):
         read_only_fields = ('id_garbage_dump',)
 
 
-class Invoices(serializers.ModelSerializer):
+class KeysSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Invoices
+        model = Keys
         fields = '__all__'
-        read_only_fields = ('id_invoices',)
+        read_only_fields = ('id_keys',)
 
 
-class InvoicesNames(serializers.ModelSerializer):
+class InvoicesNamesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InvoicesNames
@@ -58,25 +51,70 @@ class InvoicesNames(serializers.ModelSerializer):
         read_only_fields = ('id_invoices_names',)
 
 
-class ReportProblem(serializers.ModelSerializer):
+class InvoicesSerializer(serializers.ModelSerializer):
+    invoices = InvoicesNamesSerializer(many=True, read_only=True)
 
     class Meta:
-        model = ReportProblem
+        model = Invoices
         fields = '__all__'
-        read_only_fields = ('id_report_problem',)
+        read_only_fields = ('id_invoices',)
+
+    depth = 1
 
 
-class Track(serializers.ModelSerializer):
+class ScheduleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Schedule
+        fields = '__all__'
+        read_only_fields = ('id_schedule',)
+
+
+class TrackSerializer(serializers.ModelSerializer):
+    stops = BinTrackSerializer(many=True, read_only=True)
 
     class Meta:
         model = Track
         fields = '__all__'
         read_only_fields = ('id_track',)
 
+    depth = 1
 
-class TrashBin(serializers.ModelSerializer):
+
+class TrashBinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrashBin
         fields = '__all__'
         read_only_fields = ('id_trash_bin',)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',
+                  'is_active', 'is_staff', 'is_superuser', 'date_joined', 'groups',)
+        read_only_fields = ('username', 'auth_token', 'date_joined', 'groups', 'is_staff', 'is_superuser',)
+
+
+class UserModifySerializer(serializers.ModelSerializer):
+    groups = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'groups', 'password')
+        read_only_fields = ('auth_token', 'date_joined')
+        extra_kwargs = {'password': {'write_only': True}, 'groups': {'write_only': True}}
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        validated_data['is_active'] = 1
+        group = validated_data.pop('groups')
+        user = User(**validated_data)
+        user.set_password(password)
+        g = Group.objects.get(name=group)
+        user.save()
+        user.groups.add(g)
+        return user

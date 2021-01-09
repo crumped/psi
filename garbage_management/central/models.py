@@ -6,28 +6,18 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class BinTrack(models.Model):
-    id_bin_track = models.IntegerField(primary_key=True)
+    id_bin_track = models.AutoField(primary_key=True)
     bin = models.ForeignKey('TrashBin', models.DO_NOTHING, blank=True, null=True)
-    track = models.ForeignKey('Track', models.DO_NOTHING, blank=True, null=True)
+    track = models.ForeignKey('Track', models.DO_NOTHING, related_name='stops', blank=True, null=False)
     stop_number = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'bin_track'
-
-
-class CarGps(models.Model):
-    id_car_gps = models.AutoField(primary_key=True)
-    position = models.TextField(blank=True, null=True)  # This field type is a guess.
-    date_create = models.DateTimeField()
-    car = models.ForeignKey('Cars', models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'car_gps'
 
 
 class CarType(models.Model):
@@ -41,7 +31,7 @@ class CarType(models.Model):
 
 class Cars(models.Model):
     id_cars = models.AutoField(primary_key=True)
-    number_plate = models.CharField(max_length=45, blank=True, null=True)
+    number_plate = models.CharField(max_length=45, blank=False, null=False)
     car_type = models.ForeignKey(CarType, models.DO_NOTHING, db_column='car_type', blank=True, null=True)
     mileage = models.IntegerField(blank=True, null=True)
     date_oil = models.DateField(blank=True, null=True)
@@ -64,7 +54,7 @@ class GarbageDump(models.Model):
 
 
 class Invoices(models.Model):
-    id_invoices = models.IntegerField(primary_key=True)
+    id_invoices = models.AutoField(primary_key=True)
     number = models.IntegerField(blank=True, null=True)
     date_of_invoice = models.DateTimeField(blank=True, null=True)
     date_of_service = models.DateTimeField(blank=True, null=True)
@@ -79,29 +69,36 @@ class Invoices(models.Model):
 
 
 class InvoicesNames(models.Model):
-    id_invoices_names = models.IntegerField(primary_key=True)
+    id_invoices_names = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
-    adress = models.CharField(max_length=100, blank=True, null=True)
+    address = models.CharField(max_length=100, blank=True, null=True)
     nip = models.IntegerField(blank=True, null=True)
-    invoices = models.ForeignKey(Invoices, models.DO_NOTHING, blank=True, null=True)
+    invoices = models.ForeignKey(Invoices, models.DO_NOTHING, related_name='invoices', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'invoices_names'
 
 
-class ReportProblem(models.Model):
-    id_report_problem = models.AutoField(primary_key=True)
-    type_of_report = models.CharField(max_length=45, blank=True, null=True)
-    date_reported = models.DateTimeField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=45, blank=True, null=True)
-    car = models.ForeignKey(Cars, models.DO_NOTHING, blank=True, null=True)
-    bin = models.ForeignKey('TrashBin', models.DO_NOTHING, blank=True, null=True)
+class Keys(models.Model):
+    id_keys = models.AutoField(primary_key=True)
+    driver = models.ForeignKey(User, models.DO_NOTHING, db_column='driver', related_name="driver", blank=True, null=True)
+    supervisor = models.ForeignKey(User, models.DO_NOTHING, db_column='supervisor', related_name="supervisor", blank=True, null=True)
+    car = models.ForeignKey(Cars, models.DO_NOTHING, db_column='car_id', blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'keys'
+
+
+class Schedule(models.Model):
+    id_schedule = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
+    day = models.DateField(blank=True, null=True)
+    work_type = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'report_problem'
+        db_table = 'schedule'
 
 
 class Track(models.Model):
@@ -111,8 +108,6 @@ class Track(models.Model):
     car = models.ForeignKey(Cars, models.DO_NOTHING, blank=True, null=True)
     driver = models.IntegerField(blank=True, null=True)
     manager = models.IntegerField(blank=True, null=True)
-    date_of_loan_keys = models.DateTimeField(blank=True, null=True)
-    date_return_keys = models.DateTimeField(blank=True, null=True)
     garbage_dump = models.ForeignKey(GarbageDump, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
