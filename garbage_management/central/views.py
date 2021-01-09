@@ -12,10 +12,16 @@ from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializ
     UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer, InvoicesSerializer, \
     InvoicesNamesSerializer, ScheduleSerializer
 from django.contrib.auth.models import User
+from .pagination import PaginationHandlerMixin
+from rest_framework.pagination import PageNumberPagination
 
 
 def index(request):
     return render(request, 'html/main.html')
+
+
+class BasicPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
 
 
 class CarDetailsView(APIView):
@@ -45,7 +51,8 @@ class CarDetailsView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CarsView(APIView):
+class CarsView(APIView, PaginationHandlerMixin):
+    pagination_class = BasicPagination
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['kps', 'kierownik-przewozu-smieci'],
@@ -53,8 +60,12 @@ class CarsView(APIView):
     }
 
     def get(self, request, format=None):
-        cars = Cars.objects.all()
-        serializer = CarsSerializer(cars, many=True)
+        cars = Cars.objects.all().order_by('id_cars')
+        page = self.paginate_queryset(cars)
+        if page is not None:
+            serializer = self.get_paginated_response(CarsSerializer(page, many=True).data)
+        else:
+            serializer = CarsSerializer(cars, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
@@ -92,7 +103,8 @@ class TrashBinDetailsView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TrashBinsView(APIView):
+class TrashBinsView(APIView, PaginationHandlerMixin):
+    pagination_class = BasicPagination
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['kps', 'members'],
@@ -100,8 +112,12 @@ class TrashBinsView(APIView):
     }
 
     def get(self, request, format=None):
-        trash_bins = TrashBin.objects.all()
-        serializer = TrashBinSerializer(trash_bins, many=True)
+        trash_bins = TrashBin.objects.all().order_by('id_trash_bin')
+        page = self.paginate_queryset(trash_bins)
+        if page is not None:
+            serializer = self.get_paginated_response(TrashBinSerializer(page, many=True).data)
+        else:
+            serializer = TrashBinSerializer(trash_bins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
@@ -159,10 +175,11 @@ class GarbageDumpView(APIView):
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UsersView(APIView):
+class UsersView(APIView, PaginationHandlerMixin):
     """
     View to list all users in the system.
     """
+    pagination_class = BasicPagination
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
         'GET': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
@@ -174,28 +191,43 @@ class UsersView(APIView):
         current_user = User.objects.all().filter(username=request.user).first()
         serializer = UserSerializer(current_user)
         if 'szef' in serializer.data['groups']:
-            users = User.objects.all().filter(is_superuser=False, )
-            serializer = UserSerializer(users, many=True)
+            users = User.objects.all().filter(is_superuser=False, ).order_by('id')
+            page = self.paginate_queryset(users)
+            if page is not None:
+                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
+            else:
+                serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
 
         if 'kierownik-glowny' in serializer.data['groups']:
             exclude_array = ['szef']
-            users = User.objects.all().filter(is_superuser=False).exclude(groups__name__in=exclude_array)
-            serializer = UserSerializer(users, many=True)
+            users = User.objects.all().filter(is_superuser=False).exclude(groups__name__in=exclude_array).order_by('id')
+            page = self.paginate_queryset(users)
+            if page is not None:
+                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
+            else:
+                serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
 
         if 'kierownik-przewozu-smieci' in serializer.data['groups']:
             include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
-            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array)
-            serializer = UserSerializer(users, many=True)
+            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array).order_by('id')
+            page = self.paginate_queryset(users)
+            if page is not None:
+                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
+            else:
+                serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
 
         if 'kierownik-wysypiska' in serializer.data['groups']:
             include_array = ['pracownik-wysypiska']
-            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array)
-            serializer = UserSerializer(users, many=True)
+            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array).order_by('id')
+            page = self.paginate_queryset(users)
+            if page is not None:
+                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
+            else:
+                serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
-
 
     def post(self, request, format=None):
         current_user = User.objects.all().filter(username=request.user).first()
