@@ -1,12 +1,11 @@
 import datetime
 
-from django.http import Http404
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .permissions import HasGroupPermission
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from .models import Cars, TrashBin, GarbageDump, Track, BinTrack, Keys, Invoices, InvoicesNames, Schedule
 from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializer, UserSerializer,\
     UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer, InvoicesSerializer, \
@@ -14,6 +13,7 @@ from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializ
 from django.contrib.auth.models import User
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.reverse import reverse
 
 
 def index(request):
@@ -24,64 +24,38 @@ class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
 
 
-class CarDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class CarList(generics.ListCreateAPIView):
+    queryset = Cars.objects.all()
+    serializer_class = CarsSerializer
+    name = 'car-list'
+    filter_fields = ['id_cars', 'number_plate']
+    search_fields = ['id_cars', 'number_plate']
+    ordering = ['id_cars', 'car_type', 'date_oil', 'mileage_oil']
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
-        'GET': ['kps'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci', 'kierowca-smieciarki'],
+        'POST': ['kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, pk, format=None):
-        cars = Cars.objects.get(pk=pk)
-        serializer = CarsSerializer(cars)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        cars = Cars.objects.get(pk=pk)
-        serializer = CarsSerializer(cars, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        cars = Cars.objects.get(pk=pk)
-        cars.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class CarsView(APIView, PaginationHandlerMixin):
-    pagination_class = BasicPagination
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class CarDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cars.objects.all()
+    serializer_class = CarsSerializer
+    name = 'car-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
-        'GET': ['kps', 'kierownik-przewozu-smieci'],
-        'POST': ['kps', 'kierownik-przewozu-smieci'],
+        'GET': ['kierownik-przewozu-smieci', 'kierowca-smieciarki'],
+        'PUT': ['kierownik-przewozu-smieci', 'kierowca-smieciarki'],
+        'DELETE': ['kierownik-przewozu-smieci'],
     }
-
-    def get(self, request, format=None):
-        cars = Cars.objects.all().order_by('id_cars')
-        page = self.paginate_queryset(cars)
-        if page is not None:
-            serializer = self.get_paginated_response(CarsSerializer(page, many=True).data)
-        else:
-            serializer = CarsSerializer(cars, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, format=None):
-        serializer = CarsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TrashBinDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-przewozu-smieci'],
+        'DELETE': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, pk, format=None):
@@ -107,8 +81,8 @@ class TrashBinsView(APIView, PaginationHandlerMixin):
     pagination_class = BasicPagination
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'POST': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, format=None):
@@ -131,9 +105,9 @@ class TrashBinsView(APIView, PaginationHandlerMixin):
 class GarbageDumpDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+        'PUT': ['kierownik-wysypiska'],
+        'DELETE': ['kierownik-wysypiska'],
     }
 
     def get(self, request, pk, format=None):
@@ -158,8 +132,8 @@ class GarbageDumpDetailsView(APIView):
 class GarbageDumpView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+        'POST': ['kierownik-wysypiska'],
     }
 
     def get(self, request, format=None):
@@ -175,72 +149,56 @@ class GarbageDumpView(APIView):
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UsersView(APIView, PaginationHandlerMixin):
-    """
-    View to list all users in the system.
-    """
-    pagination_class = BasicPagination
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserModifySerializer
+    name = 'user-list'
+    filter_fields = ['username', 'first_name', 'last_name', 'email']
+    search_fields = ['username', 'first_name', 'last_name', 'email']
+    ordering = ['first_name', 'last_name', 'email']
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
         'POST': ['szef', 'kierownik-glowny', 'kierownik-przewozu-smieci', 'kierownik-wysypiska'],
     }
 
-    def get(self, request, format=None):
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserModifySerializer
+        return UserSerializer
 
-        current_user = User.objects.all().filter(username=request.user).first()
+    def get_queryset(self):
+        """Filter active products."""
+        current_user = User.objects.all().filter(username=self.request.user).first()
         serializer = UserSerializer(current_user)
         if 'szef' in serializer.data['groups']:
-            users = User.objects.all().filter(is_superuser=False, ).order_by('id')
-            page = self.paginate_queryset(users)
-            if page is not None:
-                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
-            else:
-                serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
+            return User.objects.all().filter(is_superuser=False, )
 
         if 'kierownik-glowny' in serializer.data['groups']:
             exclude_array = ['szef']
-            users = User.objects.all().filter(is_superuser=False).exclude(groups__name__in=exclude_array).order_by('id')
-            page = self.paginate_queryset(users)
-            if page is not None:
-                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
-            else:
-                serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
+            return User.objects.all().filter(is_superuser=False).exclude(groups__name__in=exclude_array)
 
         if 'kierownik-przewozu-smieci' in serializer.data['groups']:
             include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
-            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array).order_by('id')
-            page = self.paginate_queryset(users)
-            if page is not None:
-                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
-            else:
-                serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
+            return User.objects.all().filter(is_superuser=False, groups__name__in=include_array)
 
         if 'kierownik-wysypiska' in serializer.data['groups']:
             include_array = ['pracownik-wysypiska']
-            users = User.objects.all().filter(is_superuser=False, groups__name__in=include_array).order_by('id')
-            page = self.paginate_queryset(users)
-            if page is not None:
-                serializer = self.get_paginated_response(UserSerializer(page, many=True).data)
-            else:
-                serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
+            return User.objects.all().filter(is_superuser=False, groups__name__in=include_array)
 
-    def post(self, request, format=None):
+    def create(self, request, *args, **kwargs):
         current_user = User.objects.all().filter(username=request.user).first()
         serializer = UserSerializer(current_user)
         if 'szef' in serializer.data['groups']:
             available_groups = ['kierowca-smieciarki', 'kierownik-glowny', 'kierownik-przewozu-smieci',
                                 'kierownik-wysypiska', 'ksiegowosc', 'pracownicy-przewozacy-smieci',
                                 'pracownik-wysypiska', 'szef']
-            serializer2 = UserModifySerializer(data=request.data)
+            serializer2 = self.get_serializer(data=request.data)
             if serializer2.is_valid():
                 print(serializer2.validated_data)
                 if serializer2.validated_data['groups'] not in available_groups:
-                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error": "That group is out of your permissions"},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 serializer2.save()
                 return Response(serializer2.data)
             return Response(serializer2.errors)
@@ -249,33 +207,36 @@ class UsersView(APIView, PaginationHandlerMixin):
             available_groups = ['kierowca-smieciarki', 'kierownik-glowny', 'kierownik-przewozu-smieci',
                                 'kierownik-wysypiska', 'ksiegowosc', 'pracownicy-przewozacy-smieci',
                                 'pracownik-wysypiska']
-            serializer2 = UserModifySerializer(data=request.data)
+            serializer2 = self.get_serializer(data=request.data)
             if serializer2.is_valid():
                 print(serializer2.validated_data)
                 if serializer2.validated_data['groups'] not in available_groups:
-                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error": "That group is out of your permissions"},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 serializer2.save()
                 return Response(serializer2.data)
             return Response(serializer2.errors)
 
         if 'kierownik-przewozu-smieci' in serializer.data['groups']:
             available_groups = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
-            serializer2 = UserModifySerializer(data=request.data)
+            serializer2 = self.get_serializer(data=request.data)
             if serializer2.is_valid():
                 print(serializer2.validated_data)
                 if serializer2.validated_data['groups'] not in available_groups:
-                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error": "That group is out of your permissions"},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 serializer2.save()
                 return Response(serializer2.data)
             return Response(serializer2.errors)
 
         if 'kierownik-wysypiska' in serializer.data['groups']:
             available_groups = ['pracownik-wysypiska']
-            serializer2 = UserModifySerializer(data=request.data)
+            serializer2 = self.get_serializer(data=request.data)
             if serializer2.is_valid():
                 print(serializer2.validated_data)
                 if serializer2.validated_data['groups'] not in available_groups:
-                    return Response({"error": "That group is out of your permissions"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error": "That group is out of your permissions"},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 serializer2.save()
                 return Response(serializer2.data)
             return Response(serializer2.errors)
@@ -404,8 +365,8 @@ class UserDetailsView(APIView):
 class TrackView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'POST': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, format=None):
@@ -424,9 +385,9 @@ class TrackView(APIView):
 class TrackDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-przewozu-smieci'],
+        'DELETE': [],
     }
 
     def get(self, request, pk, format=None):
@@ -451,8 +412,8 @@ class TrackDetailsView(APIView):
 class BinTrackView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'POST': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, format=None):
@@ -476,9 +437,9 @@ class BinTrackView(APIView):
 class BinTrackDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-przewozu-smieci'],
+        'DELETE': [],
     }
 
     def get(self, request, pk, format=None):
@@ -503,10 +464,8 @@ class BinTrackDetailsView(APIView):
 class InvoicesView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['ksiegowa'],
+        'POST': ['ksiegowa'],
     }
 
     def get(self, request, format=None):
@@ -525,9 +484,9 @@ class InvoicesView(APIView):
 class InvoicesDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['ksiegowa'],
+        'PUT': ['ksiegowa'],
+        'DELETE': [],
     }
 
     def get(self, request, pk, format=None):
@@ -552,8 +511,8 @@ class InvoicesDetailsView(APIView):
 class InvoicesNamesView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['__all__'],
+        'GET': ['ksiegowa'],
+        'POST': ['ksiegowa'],
     }
 
     def get(self, request, format=None):
@@ -572,8 +531,8 @@ class InvoicesNamesView(APIView):
 class InvoicesNamesDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
+        'GET': ['ksiegowa'],
+        'PUT': ['ksiegowa'],
     }
 
     def get(self, request, pk, format=None):
@@ -593,8 +552,9 @@ class InvoicesNamesDetailsView(APIView):
 class ScheduleView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierowca-smieciarki', 'pracownik-wysypiska', 'pracownicy-przewozacy-smieci', 'kierownik-wysypiska',
+                'kierownik-przewozu-smieci'],
+        'POST': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
 
     def get(self, request, format=None):
@@ -614,9 +574,9 @@ class ScheduleView(APIView):
 class ScheduleDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
+        'DELETE': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
 
     def get(self, request, pk, format=None):
@@ -641,8 +601,8 @@ class ScheduleDetailsView(APIView):
 class KeysView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'POST': ['kps', 'someMadeUpGroup'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'POST': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, format=None):
@@ -661,9 +621,9 @@ class KeysView(APIView):
 class KeysDetailsView(APIView):
     permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
     required_groups = {
-        'GET': ['kps', 'members'],
-        'PUT': ['__all__'],
-        'DELETE': ['kps'],
+        'GET': ['kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-przewozu-smieci'],
+        'DELETE': ['kierownik-przewozu-smieci'],
     }
 
     def get(self, request, pk, format=None):
@@ -683,3 +643,12 @@ class KeysDetailsView(APIView):
         keys = Keys.objects.get(pk=pk)
         keys.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+
+    def get(self, request, *args, **kwargs):
+        return Response({'cars': reverse(CarList.name, request=request),
+                         'users': reverse(UserList.name, request=request),
+                         })
