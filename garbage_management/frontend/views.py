@@ -38,6 +38,7 @@ def login(request):
                 return render(request, 'login.html', {'form': form})
             group = get_user_group(data['user_id'])
             if group:
+                request.session['token'] = data['token']
                 return redirect(f'/{group}')
             return redirect('/login')
     else:
