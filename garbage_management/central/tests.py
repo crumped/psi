@@ -28,7 +28,7 @@ class CarsTests(TestCase):
         self.user.groups.add(self.group)
         self.user.save()
         self.client.login(username='kps', password='test')
-        url = '/cars/'
+        url = '/cars'
         data = {
             "number_plate": "Nol 1515",
             "mileage": 2545454,
@@ -40,15 +40,3 @@ class CarsTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Cars.objects.count(), 1)
 
-# client = RequestsClient()
-# response = client.get('http://testserver/users/')
-# assert response.status_code == 200
-#
-# factory = APIRequestFactory()
-# request = factory.post('/cars/', json.dumps({
-#         "number_plate": "Nol 1515",
-#         "mileage": 2545454,
-#         "date_oil": "2020-01-15",
-#         "mileage_oil": 575,
-#         "car_type": 3
-#     }), content_type='application/json')
