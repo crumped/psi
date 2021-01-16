@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import index, TrashBinDetailsView, TrashBinsView, UserDetailsView, TrackView, TrackDetailsView,\
-    BinTrackView, BinTrackDetailsView, KeysView, KeysDetailsView, InvoicesView, InvoicesDetailsView, InvoicesNamesView, \
-    InvoicesNamesDetailsView, ScheduleView, ScheduleDetailsView, CarList, CarDetail, UserList
+    BinTrackView, BinTrackDetailsView, KeysView, KeysDetailsView, InvoicesView, InvoicesDetailsView, \
+    InvoicesNamesView, InvoicesNamesDetailsView, ScheduleView, ScheduleDetailsView, CarList, CarDetail, \
+    UserList, GarbageDumpView, GarbageDumpDetailsView
 
 urlpatterns = [
     path('', index, name="mainview"),
@@ -23,4 +24,6 @@ urlpatterns = [
     path('invoices-names/<int:pk>', InvoicesNamesDetailsView.as_view(), name="invoices names details"),
     path('schedule', ScheduleView.as_view(), name="schedule"),
     path('schedule/<int:pk>', ScheduleDetailsView.as_view(), name="schedule details"),
+    path('places', GarbageDumpView.as_view(), name="garbage dumps"),
+    path('places/<int:pk>', GarbageDumpDetailsView.as_view(), name="garbage dumps details"),
 ]
