@@ -11,17 +11,11 @@ from .serializers import CarsSerializer, TrashBinSerializer, GarbageDumpSerializ
     UserModifySerializer, TrackSerializer, BinTrackSerializer, KeysSerializer, InvoicesSerializer, \
     InvoicesNamesSerializer, ScheduleSerializer
 from django.contrib.auth.models import User
-from .pagination import PaginationHandlerMixin
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.reverse import reverse
 
 
 def index(request):
     return render(request, 'html/main.html')
-
-
-class BasicPagination(PageNumberPagination):
-    page_size_query_param = 'limit'
 
 
 class CarList(generics.ListCreateAPIView):
@@ -50,103 +44,50 @@ class CarDetail(generics.RetrieveUpdateDestroyAPIView):
     }
 
 
-class TrashBinDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class TrashBinList(generics.ListCreateAPIView):
+    queryset = TrashBin.objects.all()
+    serializer_class = TrashBinSerializer
+    name = 'trash-bin-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
+    required_groups = {
+        'GET': ['kierownik-przewozu-smieci'],
+        'POST': ['kierownik-przewozu-smieci'],
+    }
+
+
+class TrashBinDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TrashBin.objects.all()
+    serializer_class = TrashBinSerializer
+    name = 'trash-bin-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci'],
         'PUT': ['kierownik-przewozu-smieci'],
         'DELETE': ['kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, pk, format=None):
-        trash_bin = TrashBin.objects.get(pk=pk)
-        serializer = TrashBinSerializer(trash_bin)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        trash_bin = TrashBin.objects.get(pk=pk)
-        serializer = TrashBinSerializer(trash_bin, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        trash_bin = TrashBin.objects.get(pk=pk)
-        trash_bin.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class TrashBinsView(APIView, PaginationHandlerMixin):
-    pagination_class = BasicPagination
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
-    required_groups = {
-        'GET': ['kierownik-przewozu-smieci'],
-        'POST': ['kierownik-przewozu-smieci'],
-    }
-
-    def get(self, request, format=None):
-        trash_bins = TrashBin.objects.all().order_by('id_trash_bin')
-        page = self.paginate_queryset(trash_bins)
-        if page is not None:
-            serializer = self.get_paginated_response(TrashBinSerializer(page, many=True).data)
-        else:
-            serializer = TrashBinSerializer(trash_bins, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, format=None):
-        serializer = TrashBinSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class GarbageDumpDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
-    required_groups = {
-        'GET': ['kierownik-przewozu-smieci', 'kierownik-wysypiska'],
-        'PUT': ['kierownik-wysypiska'],
-        'DELETE': ['kierownik-wysypiska'],
-    }
-
-    def get(self, request, pk, format=None):
-        garbage_dump = GarbageDump.objects.get(pk=pk)
-        serializer = GarbageDumpSerializer(garbage_dump)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, pk, format=None):
-        garbage_dump = GarbageDump.objects.get(pk=pk)
-        serializer = GarbageDumpSerializer(garbage_dump, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        garbage_dump = GarbageDump.objects.get(pk=pk)
-        garbage_dump.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class GarbageDumpView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class GarbageDumpList(generics.ListCreateAPIView):
+    queryset = GarbageDump.objects.all()
+    serializer_class = GarbageDumpSerializer
+    name = 'garbage-dump-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci', 'kierownik-wysypiska'],
         'POST': ['kierownik-wysypiska'],
     }
 
-    def get(self, request, format=None):
-        garbage_dumps = GarbageDump.objects.all()
-        serializer = CarsSerializer(garbage_dumps, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = GarbageDumpSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+class GarbageDumpDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = GarbageDump.objects.all()
+    serializer_class = GarbageDumpSerializer
+    name = 'garbage-dump-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
+    required_groups = {
+        'GET': ['kierownik-przewozu-smieci', 'kierownik-wysypiska'],
+        'PUT': ['kierownik-wysypiska'],
+        'DELETE': ['kierownik-wysypiska'],
+    }
 
 
 class UserList(generics.ListCreateAPIView):
@@ -362,287 +303,145 @@ class UserDetailsView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TrackView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class TrackList(generics.ListCreateAPIView):
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+    name = 'track-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci'],
         'POST': ['kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, format=None):
-        tracks = Track.objects.all()
-        serializer = TrackSerializer(tracks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = TrackSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TrackDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class TrackDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
+    name = 'track-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci'],
         'PUT': ['kierownik-przewozu-smieci'],
         'DELETE': [],
     }
 
-    def get(self, request, pk, format=None):
-        track = Track.objects.get(pk=pk)
-        serializer = TrackSerializer(track)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        track = Track.objects.get(pk=pk)
-        serializer = TrackSerializer(track, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        track = Track.objects.get(pk=pk)
-        track.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class BinTrackView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class BinTrackList(generics.ListCreateAPIView):
+    queryset = BinTrack.objects.all()
+    serializer_class = BinTrackSerializer
+    name = 'bin-track-list'
+    filter_fields = ['track']
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci'],
         'POST': ['kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, format=None):
-        track_id = request.query_params.get('track-id', None)
-        if track_id is not None:
-            print(track_id)
-            tracks = BinTrack.objects.all().filter(track=track_id)
-            serializer = BinTrackSerializer(tracks, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"missing track-id parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, format=None):
-        serializer = BinTrackSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class BinTrackDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class BinTrackDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BinTrack.objects.all()
+    serializer_class = BinTrackSerializer
+    name = 'bin-track-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-przewozu-smieci'],
         'PUT': ['kierownik-przewozu-smieci'],
         'DELETE': [],
     }
 
-    def get(self, request, pk, format=None):
-        bin_track = BinTrack.objects.get(pk=pk)
-        serializer = BinTrackSerializer(bin_track)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        bin_track = BinTrack.objects.get(pk=pk)
-        serializer = BinTrackSerializer(bin_track, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        bin_track = BinTrack.objects.get(pk=pk)
-        bin_track.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class InvoicesView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class InvoicesList(generics.ListCreateAPIView):
+    queryset = Invoices.objects.all()
+    serializer_class = InvoicesSerializer
+    name = 'invoices-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['ksiegowa'],
         'POST': ['ksiegowa'],
     }
 
-    def get(self, request, format=None):
-        invoices = Invoices.objects.all()
-        serializer = InvoicesSerializer(invoices, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = InvoicesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class InvoicesDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class InvoicesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Invoices.objects.all()
+    serializer_class = InvoicesSerializer
+    name = 'invoices-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['ksiegowa'],
         'PUT': ['ksiegowa'],
         'DELETE': [],
     }
 
-    def get(self, request, pk, format=None):
-        invoices = Invoices.objects.get(pk=pk)
-        serializer = InvoicesSerializer(invoices)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        invoices = Invoices.objects.get(pk=pk)
-        serializer = InvoicesSerializer(invoices, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        invoices = Invoices.objects.get(pk=pk)
-        invoices.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class InvoicesNamesView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class InvoicesNamesList(generics.ListCreateAPIView):
+    queryset = InvoicesNames.objects.all()
+    serializer_class = InvoicesNamesSerializer
+    name = 'invoices-names-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['ksiegowa'],
         'POST': ['ksiegowa'],
     }
 
-    def get(self, request, format=None):
-        invoices = InvoicesNames.objects.all()
-        serializer = InvoicesNamesSerializer(invoices, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = InvoicesNamesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class InvoicesNamesDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class InvoicesNamesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = InvoicesNames.objects.all()
+    serializer_class = InvoicesNamesSerializer
+    name = 'invoices-names-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['ksiegowa'],
         'PUT': ['ksiegowa'],
+        'DELETE': [],
     }
 
-    def get(self, request, pk, format=None):
-        invoices = InvoicesNames.objects.get(pk=pk)
-        serializer = InvoicesNamesSerializer(invoices)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        invoices = InvoicesNames.objects.get(pk=pk)
-        serializer = InvoicesNamesSerializer(invoices, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ScheduleView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class ScheduleList(generics.ListCreateAPIView):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+    name = 'schedule-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierowca-smieciarki', 'pracownik-wysypiska', 'pracownicy-przewozacy-smieci', 'kierownik-wysypiska',
                 'kierownik-przewozu-smieci'],
         'POST': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, format=None):
-        this_month = datetime.datetime.now().month
-        schedule = Schedule.objects.all().filter(day__month=this_month)
-        serializer = ScheduleSerializer(schedule, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = ScheduleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ScheduleDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class ScheduleDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+    name = 'schedule-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
         'PUT': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
         'DELETE': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, pk, format=None):
-        schedule = Schedule.objects.get(pk=pk)
-        serializer = ScheduleSerializer(schedule)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
-        schedule = Schedule.objects.get(pk=pk)
-        serializer = ScheduleSerializer(schedule, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        schedule = Schedule.objects.get(pk=pk)
-        schedule.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class KeysView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class KeysList(generics.ListCreateAPIView):
+    queryset = Keys.objects.all()
+    serializer_class = KeysSerializer
+    name = 'keys-list'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
-        'GET': ['kierownik-przewozu-smieci'],
-        'POST': ['kierownik-przewozu-smieci'],
+        'GET': ['kierowca-smieciarki', 'pracownik-wysypiska', 'pracownicy-przewozacy-smieci', 'kierownik-wysypiska',
+                'kierownik-przewozu-smieci'],
+        'POST': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
 
-    def get(self, request, format=None):
-        keys = Keys.objects.all()
-        serializer = KeysSerializer(keys, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer =KeysSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
-
-class KeysDetailsView(APIView):
-    permission_classes = [IsAuthenticated, HasGroupPermission]  # Ustawianie klas zezwolen
+class KeysDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Keys.objects.all()
+    serializer_class = KeysSerializer
+    name = 'keys-detail'
+    permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
-        'GET': ['kierownik-przewozu-smieci'],
-        'PUT': ['kierownik-przewozu-smieci'],
-        'DELETE': ['kierownik-przewozu-smieci'],
+        'GET': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
+        'PUT': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
+        'DELETE': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
-
-    def get(self, request, pk, format=None):
-        keys = Keys.objects.get(pk=pk)
-        serializer = KeysSerializer(keys)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, pk, format=None):
-        keys = Keys.objects.get(pk=pk)
-        serializer = KeysSerializer(keys, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        keys = Keys.objects.get(pk=pk)
-        keys.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ApiRoot(generics.GenericAPIView):
@@ -651,4 +450,12 @@ class ApiRoot(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return Response({'cars': reverse(CarList.name, request=request),
                          'users': reverse(UserList.name, request=request),
+                         'trash-bins': reverse(TrashBinList.name, request=request),
+                         'bin-tracks': reverse(BinTrackList.name, request=request),
+                         'garbage-dumps': reverse(GarbageDumpList.name, request=request),
+                         'tracks': reverse(TrackList.name, request=request),
+                         'invoices': reverse(InvoicesList.name, request=request),
+                         'invoices-names': reverse(InvoicesNamesList.name, request=request),
+                         'schedules': reverse(ScheduleList.name, request=request),
+                         'keys': reverse(KeysList.name, request=request),
                          })

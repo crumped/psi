@@ -18,6 +18,7 @@ class BinTrack(models.Model):
     class Meta:
         managed = False
         db_table = 'bin_track'
+        ordering = ['id_bin_track']
 
 
 class CarType(models.Model):
@@ -41,6 +42,9 @@ class Cars(models.Model):
         managed = False
         db_table = 'cars'
 
+    def __str__(self):
+        return self.number_plate
+
 
 class GarbageDump(models.Model):
     id_garbage_dump = models.AutoField(primary_key=True)
@@ -51,6 +55,9 @@ class GarbageDump(models.Model):
     class Meta:
         managed = False
         db_table = 'garbage_dump'
+
+    def __str__(self):
+        return self.address
 
 
 class Invoices(models.Model):
@@ -85,9 +92,11 @@ class Keys(models.Model):
     driver = models.ForeignKey(User, models.DO_NOTHING, db_column='driver', related_name="driver", blank=True, null=True)
     supervisor = models.ForeignKey(User, models.DO_NOTHING, db_column='supervisor', related_name="supervisor", blank=True, null=True)
     car = models.ForeignKey(Cars, models.DO_NOTHING, db_column='car_id', blank=True, null=True)
+
     class Meta:
         managed = False
         db_table = 'keys'
+        ordering = ['id_keys']
 
 
 class Schedule(models.Model):
@@ -113,6 +122,7 @@ class Track(models.Model):
     class Meta:
         managed = False
         db_table = 'track'
+        ordering = ['id_track']
 
 
 class TrashBin(models.Model):

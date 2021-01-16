@@ -36,6 +36,9 @@ class GarbageDumpSerializer(serializers.ModelSerializer):
 
 
 class KeysSerializer(serializers.ModelSerializer):
+    driver = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field="username")
+    supervisor = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field="username")
+    car = serializers.SlugRelatedField(queryset=Cars.objects.all(), slug_field="number_plate")
 
     class Meta:
         model = Keys
@@ -72,13 +75,13 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 class TrackSerializer(serializers.ModelSerializer):
     stops = BinTrackSerializer(many=True, read_only=True)
+    car = serializers.SlugRelatedField(queryset=Cars.objects.all(), slug_field="number_plate")
+    garbage_dump = serializers.SlugRelatedField(queryset=GarbageDump.objects.all(), slug_field="address")
 
     class Meta:
         model = Track
         fields = '__all__'
         read_only_fields = ('id_track',)
-
-    depth = 1
 
 
 class TrashBinSerializer(serializers.ModelSerializer):
