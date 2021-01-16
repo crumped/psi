@@ -44,3 +44,8 @@ def login(request):
     else:
         form = LoginForm()
         return render(request, 'login.html', {'form': form})
+
+
+def index_kps(request):
+    if request.method == 'GET':
+        return render(request, 'kierownik-przewozu-smieci/index.html')
