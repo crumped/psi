@@ -49,3 +49,8 @@ def login(request):
 def index_kps(request):
     if request.method == 'GET':
         return render(request, 'kierownik-przewozu-smieci/index.html')
+
+
+def users_kps(request):
+    if request.method == 'GET':
+        return render(request, 'kierownik-przewozu-smieci/users.html')

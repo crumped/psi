@@ -17,7 +17,7 @@ gevent-websocket==0.10.1
 greenlet==1.0a1
 idna==2.10
 mysqlclient==2.0.1
-pkg-resources==0.0.0
+#pkg-resources==0.0.0
 protobuf==3.14.0
 pyinstaller==4.1
 pyinstaller-hooks-contrib==2020.10
