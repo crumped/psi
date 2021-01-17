@@ -19,9 +19,9 @@ def get_user_group(user_id):
     return all_groups[group_index]
 
 
-def merge_url(request):
+def merge_url(request, path):
     domain = request.META['HTTP_HOST']
-    url = f'http://{domain}/api-token-auth'
+    url = f'http://{domain}/{path}'
     return url
 
 
@@ -29,7 +29,7 @@ def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            url = merge_url(request)
+            url = merge_url(request, "api-token-auth")
             my_obj = {'username': form.data['login'], 'password': form.data['password']}
             response = requests.post(url, data=my_obj)
             data = response.json()
