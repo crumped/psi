@@ -59,3 +59,14 @@ def users_kps(request):
         data = response.json()
         print(data)
         return render(request, 'kierownik-przewozu-smieci/users.html', {'data': data["results"]})
+
+
+def places_kps(request):
+    if request.method == 'GET':
+        url = merge_url(request, "api/places")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+        return render(request, 'kierownik-przewozu-smieci/places.html', {'data': data["results"]})
+
