@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 import requests
-from .forms import LoginForm
+from .forms import LoginForm, AddUserForm
 
 
 def get_user_group(user_id):
@@ -64,3 +64,11 @@ def users_kps(request):
         data = response.json()
         print(data)
         return render(request, 'kierownik-przewozu-smieci/users.html', {'data': data["results"]})
+
+def adduser_kps(request):
+    if request.method == 'GET':
+        form = AddUserForm(request.POST)
+        return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+
+
+

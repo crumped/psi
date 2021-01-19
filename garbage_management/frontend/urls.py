@@ -12,7 +12,8 @@ urlpatterns = [
 
     path('kierownik-przewozu-smieci', index_kps, name="index kps"),
     path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
-
+    path('kierownik-przewozu-smieci/uzytkownicy/dodaj', adduser_kps, name="adduser kps"),
+  
     path('kierownik-wysypiska', login, name="login"),
 
     path('ksiegowosc', login, name="login"),
