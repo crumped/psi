@@ -1,0 +1,31 @@
+{% extends "../layout.html" %}
+{% block title %} Miejsca rozładunku - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="col-10 mx-auto mt-5">
+<table class="table table-secondary table-hover">
+   <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Adres GPS</th>
+      <th scope="col">Adres</th>
+      <th scope="col">Kategoria</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+      <tr>
+        <td>{{ item.id_garbage_dump }}</td>
+        <td>{{ item.address_gps }}</td>
+        <td>{{ item.address }}</td>
+        <td>{{ item.category }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+{% endblock %}
