@@ -38,7 +38,7 @@ def login(request):
             my_obj = {'username': form.data['login'], 'password': form.data['password']}
             response = requests.post(url, data=my_obj)
             data = response.json()
-            if response.status_code == (404 or 400):
+            if response.status_code == 404 or response.status_code == 400:
                 form = LoginForm()
                 return render(request, 'login.html', {'form': form})
             group = get_user_group(data['user_id'])
