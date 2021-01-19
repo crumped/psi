@@ -25,6 +25,11 @@ def merge_url(request, path):
     return url
 
 
+def index(request):
+    if request.method == 'GET':
+        return render(request, 'index.html')
+
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
