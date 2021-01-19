@@ -2,28 +2,34 @@
 {% block title %} Uzytkownicy - kps {% endblock %}
 {% block href%} /kierownik-przewozu-smieci {% endblock %}
 {% block content %}
+
 <div class="container-fluid">
 
 <div class="col-10 mx-auto">
   <div style="float: right;" class="mt-5 mb-3">
-  <a href="#" class="btn btn btn-success btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj użytkownika</a>
+  <a href="/kierownik-przewozu-smieci/uzytkownicy/dodaj" class="btn btn btn-success btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj użytkownika</a>
   </div>
 <table class="table table-secondary table-hover">
    <thead>
     <tr>
-      <th scope="col">#</th>
+      <th scope="col">ID</th>
       <th scope="col">Imię</th>
       <th scope="col">Nazwisko</th>
       <th scope="col">Operacje</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>imie</td>
-      <td>nazwisko</td>
-      <td>operacja</td>
-    </tr>
+    {% for item in data %}
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.first_name }}</td>
+        <td>{{ item.last_name }}</td>
+        <td>
+          <a href="/kierownik-przewozu-smieci/uzytkownicy/edytuj/{{item.id}}" class="btn btn btn-warning btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
+          <a href="/kierownik-przewozu-smieci/uzytkownicy/usun/{{item.id}}" class="btn btn btn-danger btn-md " tabindex="-1" role="button" aria-disabled="true">Usuń</a>
+        </td>
+      </tr>
+    {% endfor %}
   </tbody>
 </table>
 </div>

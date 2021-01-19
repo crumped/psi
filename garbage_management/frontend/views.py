@@ -53,4 +53,9 @@ def index_kps(request):
 
 def users_kps(request):
     if request.method == 'GET':
-        return render(request, 'kierownik-przewozu-smieci/users.html')
+        url = merge_url(request, "api/users")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+        return render(request, 'kierownik-przewozu-smieci/users.html', {'data': data["results"]})
