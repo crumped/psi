@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 import requests
-from .forms import LoginForm
+from .forms import LoginForm, AddUserForm
 
 
 def get_user_group(user_id):
@@ -23,6 +23,11 @@ def merge_url(request, path):
     domain = request.META['HTTP_HOST']
     url = f'http://{domain}/{path}'
     return url
+
+
+def index(request):
+    if request.method == 'GET':
+        return render(request, 'index.html')
 
 
 def login(request):
@@ -70,3 +75,8 @@ def places_kps(request):
         print(data)
         return render(request, 'kierownik-przewozu-smieci/places.html', {'data': data["results"]})
 
+
+def adduser_kps(request):
+    if request.method == 'GET':
+        form = AddUserForm(request.POST)
+        return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
