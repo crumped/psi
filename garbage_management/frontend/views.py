@@ -84,8 +84,20 @@ def places_kps(request):
 
 def adduser_kps(request):
     if request.method == 'GET':
-        form = AddUserForm(request.POST)
+        form = AddUserForm()
         return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+    else:
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/users")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {"username": form.data['username'], "first_name": form.data['firstname'],"last_name": form.data['lastname'],"groups": form.data['group'],"password": form.data['password']}
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = AddUserForm()
+                return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/uzytkownicy")
 
 
 def deleteuser_kps(request, id):
