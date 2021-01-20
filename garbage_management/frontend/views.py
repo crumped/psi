@@ -109,3 +109,17 @@ def deleteuser_kps(request, id):
         print(response.status_code)
         # return users_kps(request)
         return redirect('/kierownik-przewozu-smieci/uzytkownicy')
+
+def cars_kps(request):
+    if request.method == 'GET':
+        url = merge_url(request, "api/cars")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+        return render(request, 'kierownik-przewozu-smieci/cars.html', {'data': data["results"]})
+
+def addcars_kps(request):
+    if request.method == 'GET':
+        return render(request, 'kierownik-przewozu-smieci/addcars.html')
+

@@ -12,7 +12,9 @@ urlpatterns = [
     path('kierownik-glowny', login, name="login"),
 
     path('kierownik-przewozu-smieci', index_kps, name="index kps"),
+    path('kierownik-przewozu-smieci/pojazdy', cars_kps, name="cars kps"),
     path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
+    path('kierownik-przewozu-smieci/pojazdy/dodaj', addcars_kps, name="cars kps"),
     path('kierownik-przewozu-smieci/miejscaRozladunku', places_kps, name="places kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/dodaj', adduser_kps, name="adduser kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', deleteuser_kps, name="deleteuser kps"),
