@@ -46,3 +46,9 @@ a, a:hover {
         display: none !important;
     }
 }
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}

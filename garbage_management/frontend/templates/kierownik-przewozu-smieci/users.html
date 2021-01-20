@@ -9,13 +9,14 @@
   <div style="float: right;" class="mt-5 mb-3">
   <a href="/kierownik-przewozu-smieci/uzytkownicy/dodaj" class="btn btn btn-success btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj użytkownika</a>
   </div>
-<table class="table table-secondary table-hover">
+<table class="table table-striped table-light table-hover">
    <thead>
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Imię</th>
       <th scope="col">Nazwisko</th>
-      <th scope="col">Operacje</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -24,8 +25,10 @@
         <td>{{ item.id }}</td>
         <td>{{ item.first_name }}</td>
         <td>{{ item.last_name }}</td>
-        <td>
+        <td class="fit">
           <a href="/kierownik-przewozu-smieci/uzytkownicy/edytuj/{{item.id}}" class="btn btn btn-warning btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
+        </td>
+        <td class="fit">
           <form method="post" action="/kierownik-przewozu-smieci/uzytkownicy/usun/{{item.id}}">
             {% csrf_token %}
             <button class="btn btn btn-danger btn-md " tabindex="-1" role="submit" aria-disabled="true">Usuń</button>
