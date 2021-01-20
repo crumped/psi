@@ -2,10 +2,15 @@
 {% block title %} Panel Główny kps {% endblock %}
 {% block href%} /kierownik-przewozu-smieci {% endblock %}
 {% block content %}
-
+{% load static %}
 <div class="container-fluid">
-    <div class="mt-3">
-        <h1 class="text-center">Panel Główny</h1>
+    <div class="row">
+        <div class="col-6 mt-3 d-flex justify-content-center align-items-center">
+            <h1 class="text-center me-3">Panel Główny</h1>
+        </div>
+        <div class="col-6 mt-3 d-flex justify-content-center align-items-center" style="border-left: 1px solid #ccc;">
+            <img src="{% static 'images/basura.png' %}">
+        </div>
     </div>
   <div class="row mt-5">
     <div class="d-grid col-4 mt-3">

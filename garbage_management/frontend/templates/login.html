@@ -16,7 +16,8 @@
         <div class="col p-0 text-center d-flex justify-content-center align-items-center display-none">
             <img src="{% static 'svg/login.svg' %}" class="w-100">
         </div>
-        <div class="col p-0 bg-custom d-flex justify-content-center align-items-center flex-column w-100">
+        <div class="col p-0 bg-custom d-flex align-items-center flex-column w-100" style="padding-top: 130px !important;">
+            <img src="{% static 'images/basura.png' %}">
             <form action="/login" method="post" class="w-75" action="#">
                 {% csrf_token %}
                 {% for field in form %}
