@@ -26,7 +26,10 @@
         <td>{{ item.last_name }}</td>
         <td>
           <a href="/kierownik-przewozu-smieci/uzytkownicy/edytuj/{{item.id}}" class="btn btn btn-warning btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
-          <a href="/kierownik-przewozu-smieci/uzytkownicy/usun/{{item.id}}" class="btn btn btn-danger btn-md " tabindex="-1" role="button" aria-disabled="true">Usuń</a>
+          <form method="post" action="/kierownik-przewozu-smieci/uzytkownicy/usun/{{item.id}}">
+            {% csrf_token %}
+            <button class="btn btn btn-danger btn-md " tabindex="-1" role="submit" aria-disabled="true">Usuń</button>
+          </form>
         </td>
       </tr>
     {% endfor %}

@@ -80,3 +80,14 @@ def adduser_kps(request):
     if request.method == 'GET':
         form = AddUserForm(request.POST)
         return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+
+
+def deleteuser_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/users/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        print(response)
+        print(response.status_code)
+        # return users_kps(request)
+        return redirect('/kierownik-przewozu-smieci/uzytkownicy')
