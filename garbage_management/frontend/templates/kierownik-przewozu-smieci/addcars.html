@@ -1,0 +1,24 @@
+{% extends "../layout.html" %}
+{% block title %} Dodaj pojazd - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+<div class="container-fluid">
+
+  <form class="row mt-5" method="post">
+
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="col-md-4">
+        <label class="form-label whitetext" for="{{ field.auto_id }}">{{ field.label }}</label>
+        {{ field }}
+    </div>
+    {% endfor %}
+  <div class="col-12 mt-3">
+
+    <button type="submit" class="btn btn-success" style="float:right;">Dodaj pojazd</button>
+
+  </div>
+</form>
+
+</div>
+{% endblock %}
