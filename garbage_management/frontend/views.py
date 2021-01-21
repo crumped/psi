@@ -102,8 +102,7 @@ def delete_user_kps(request, id):
     if request.method == "POST":
         url = merge_url(request, "api/users/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
-        response = requests.get(url, headers=headers_dict)
-        data = response.json()
+        response = requests.delete(url, headers=headers_dict)
         return redirect('/kierownik-przewozu-smieci/uzytkownicy')
 
 
