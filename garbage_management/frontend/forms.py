@@ -19,5 +19,5 @@ class AddUserForm(forms.Form):
                                                                                                'placeholder': 'Nazwisko'}))
     adress = forms.CharField(label="Adres", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                           'placeholder': 'Adres'}))
-    CHOICES = (('kierowca-smieciarki', 'Kierowca Śmieciarki'), ('pracownik-przewazacy-smieci', 'Pracownik Śmieciarki'),)
+    CHOICES = (('kierowca-smieciarki', 'Kierowca Śmieciarki'), ('pracownicy-przewozacy-smieci', 'Pracownik Śmieciarki'),)
     group = forms.ChoiceField(label="Stanowisko", choices=CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
