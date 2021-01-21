@@ -295,3 +295,71 @@ def delete_car_kps(request, id):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.delete(url, headers=headers_dict)
         return redirect('/kierownik-przewozu-smieci/pojazdy')
+
+
+def trash_bin_kps(request):
+    if request.method == 'GET':
+        url = merge_url(request, "api/trash-bins")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        return render(request, 'kierownik-przewozu-smieci/trash_bins/trash_bins.html', {'data': data["results"]})
+
+
+def add_trash_bin_kps(request):
+    if request.method == 'GET':
+        form = TrashBinForm()
+        return render(request, 'kierownik-przewozu-smieci/trash_bins/add.html', {'form': form})
+    else:
+        form = TrashBinForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/trash-bins")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {"bin_capacity": form.data['bin_capacity'],
+                      "bin_type": form.data['bin_type'],
+                      "address": form.data['address'],
+                      "bin_size": form.data['bin_size']
+                      }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = CarsForm()
+                return render(request, 'kierownik-przewozu-smieci/trash_bins/trash_bins.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/pojemniki")
+
+
+def delete_trash_bin_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/trash-bins/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        return redirect('/kierownik-przewozu-smieci/pojemniki')
+
+
+def edit_trash_bin_kps(request, id):
+    if request.method == 'GET':
+        url = merge_url(request, "api/trash-bins/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        form = TrashBinForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/trash_bins/edit.html', {'form': form, 'trash-bins_id': id})
+    else:
+        form = TrashBinForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/trash-bins/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                      "bin_capacity": form.data['bin_capacity'],
+                      "bin_type": form.data['bin_type'],
+                      "address": form.data['address'],
+                      "bin_size": form.data['bin_size']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/trash-bins/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = TrashBinForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/trash_bins/edit.html',
+                              {'form': form, 'trash-bins_id': id})
+            return redirect("/kierownik-przewozu-smieci/pojemniki")

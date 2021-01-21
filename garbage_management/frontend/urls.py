@@ -31,6 +31,11 @@ urlpatterns = [
     path('kierownik-przewozu-smieci/uzytkownicy/dodaj', add_user_kps, name="add user kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', delete_user_kps, name="delete user kps"),
 
+    path('kierownik-przewozu-smieci/pojemniki', trash_bin_kps, name="trash bin kps"),
+    path('kierownik-przewozu-smieci/pojemniki/dodaj', add_trash_bin_kps, name="trash bin kps"),
+    path('kierownik-przewozu-smieci/pojemniki/usun/<int:id>', delete_trash_bin_kps, name="delete car kps"),
+    path('kierownik-przewozu-smieci/pojemniki/edytuj/<int:id>', edit_trash_bin_kps, name="delete car kps"),
+
     path('kierownik-wysypiska', login, name="login"),
 
     path('ksiegowosc', login, name="login"),

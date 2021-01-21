@@ -80,3 +80,13 @@ class StopsForm(forms.Form):
     stop_number = forms.IntegerField(label='Numer przystanku', widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
 
+class TrashBinForm(forms.Form):
+    bin_capacity = forms.CharField(label="Gęstość zaludnienia", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                                          'placeholder': 'Gęstość zaludnienia'}))
+    CHOICES = (('Szkło', 'Szkło'), ('Papier', 'Papier'), ('Plastik', 'Plastik'), ('Organiczne', 'Organiczne'), ('Mieszane', 'Mieszane'))
+    bin_type = forms.ChoiceField(label='Rodzaj pojemnika na śmieci', choices=CHOICES, initial=0, widget=forms.Select(
+        attrs={'class': 'form-select'}))
+    address = forms.CharField(label="Adres", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                                          'placeholder': 'Adres'}))
+    bin_size = forms.CharField(label="Rozmiar pojemnika", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                                          'placeholder': 'Rozmiar pojemnika'}))
