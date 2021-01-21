@@ -77,6 +77,7 @@ class TrackSerializer(serializers.ModelSerializer):
     stops = BinTrackSerializer(many=True, read_only=True)
     car = serializers.SlugRelatedField(queryset=Cars.objects.all(), slug_field="number_plate")
     garbage_dump = serializers.SlugRelatedField(queryset=GarbageDump.objects.all(), slug_field="address")
+    driver = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field="username")
 
     class Meta:
         model = Track

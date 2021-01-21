@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 import requests
-from .forms import LoginForm, AddUserForm
+from .forms import *
 
 
 def get_user_group(user_id):
@@ -69,7 +69,7 @@ def users_kps(request):
         response = requests.get(url, headers=headers_dict)
         data = response.json()
         print(data)
-        return render(request, 'kierownik-przewozu-smieci/users.html', {'data': data["results"]})
+        return render(request, 'kierownik-przewozu-smieci/users/users.html', {'data': data["results"]})
 
 
 def places_kps(request):
@@ -79,13 +79,13 @@ def places_kps(request):
         response = requests.get(url, headers=headers_dict)
         data = response.json()
         print(data)
-        return render(request, 'kierownik-przewozu-smieci/places.html', {'data': data["results"]})
+        return render(request, 'kierownik-przewozu-smieci/places/places.html', {'data': data["results"]})
 
 
-def adduser_kps(request):
+def add_user_kps(request):
     if request.method == 'GET':
         form = AddUserForm()
-        return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+        return render(request, 'kierownik-przewozu-smieci/users/adduser.html', {'form': form})
     else:
         form = AddUserForm(request.POST)
         if form.is_valid():
@@ -96,11 +96,11 @@ def adduser_kps(request):
             data = response.json()
             if response.status_code == 404 or response.status_code == 400:
                 form = AddUserForm()
-                return render(request, 'kierownik-przewozu-smieci/adduser.html', {'form': form})
+                return render(request, 'kierownik-przewozu-smieci/users/adduser.html', {'form': form})
             return redirect("/kierownik-przewozu-smieci/uzytkownicy")
 
 
-def deleteuser_kps(request, id):
+def delete_user_kps(request, id):
     if request.method == "POST":
         url = merge_url(request, "api/users/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
@@ -109,6 +109,7 @@ def deleteuser_kps(request, id):
         print(response.status_code)
         # return users_kps(request)
         return redirect('/kierownik-przewozu-smieci/uzytkownicy')
+
 
 def cars_kps(request):
     if request.method == 'GET':
@@ -119,7 +120,56 @@ def cars_kps(request):
         print(data)
         return render(request, 'kierownik-przewozu-smieci/cars.html', {'data': data["results"]})
 
-def addcars_kps(request):
+
+def add_cars_kps(request):
     if request.method == 'GET':
         return render(request, 'kierownik-przewozu-smieci/addcars.html')
 
+
+def tracks_kps(request):
+    if request.method == 'GET':
+        url = merge_url(request, "api/tracks")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+        return render(request, 'kierownik-przewozu-smieci/tracks/tracks.html', {'data': data["results"]})
+
+
+def add_track_kps(request):
+    if request.method == 'GET':
+        form = TrackForm()
+        return render(request, 'kierownik-przewozu-smieci/tracks/addtrack.html', {'form': form})
+    else:
+        form = TrackForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/tracks")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "car": form.data['car'],
+                "garbage_dump": form.data['garbage_dump'],
+                "start_date": form.data['start_date'],
+                "is_done": form.data['is_done'],
+                "driver": form.data['driver']
+            }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = TrackForm()
+                return render(request, 'kierownik-przewozu-smieci/tracks/addtrack.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/trasy")
+
+
+def edite_track_kps(request):
+    return 0
+
+
+def delete_track_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/tracks/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        print(response)
+        print(response.status_code)
+        # return users_kps(request)
+        return redirect('/kierownik-przewozu-smieci/trasy')

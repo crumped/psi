@@ -12,12 +12,20 @@ urlpatterns = [
     path('kierownik-glowny', login, name="login"),
 
     path('kierownik-przewozu-smieci', index_kps, name="index kps"),
+
     path('kierownik-przewozu-smieci/pojazdy', cars_kps, name="cars kps"),
-    path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
-    path('kierownik-przewozu-smieci/pojazdy/dodaj', addcars_kps, name="cars kps"),
+    path('kierownik-przewozu-smieci/pojazdy/dodaj', add_cars_kps, name="add car kps"),
+
     path('kierownik-przewozu-smieci/miejscaRozladunku', places_kps, name="places kps"),
-    path('kierownik-przewozu-smieci/uzytkownicy/dodaj', adduser_kps, name="adduser kps"),
-    path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', deleteuser_kps, name="deleteuser kps"),
+
+    path('kierownik-przewozu-smieci/trasy', tracks_kps, name="tracks kps"),
+    path('kierownik-przewozu-smieci/trasy/dodaj', add_track_kps, name="add track kps"),
+    path('kierownik-przewozu-smieci/trasy/edytuj/<int:id>', edite_track_kps, name="edite track kps"),
+    path('kierownik-przewozu-smieci/trasy/usun/<int:id>', delete_track_kps, name="delete track kps"),
+
+    path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
+    path('kierownik-przewozu-smieci/uzytkownicy/dodaj', add_user_kps, name="add user kps"),
+    path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', delete_user_kps, name="delete user kps"),
 
     path('kierownik-wysypiska', login, name="login"),
 

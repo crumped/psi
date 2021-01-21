@@ -1,0 +1,46 @@
+{% extends "../layout.html" %}
+{% block title %} Trasy - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <div class="col-10 mx-auto">
+    <div style="float: right;" class="mt-5 mb-3">
+      <a href="/kierownik-przewozu-smieci/trasy/dodaj" class="btn btn btn-success-custom btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj trase</a>
+    </div>
+    <table class="table table-striped table-light table-hover">
+       <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Kierowca</th>
+          <th scope="col">Samochód</th>
+          <th scope="col">Przystanek końcowy</th>
+          <th scope="col">Status</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+          <tr>
+            <td>{{ item.id_track }}</td>
+            <td>{{ item.driver }}</td>
+            <td>{{ item.car }}</td>
+            <td>{{ item.garbage_dump }}</td>
+            <td>{{ item.is_done }}</td>
+            <td class="fit">
+              <a href="/kierownik-przewozu-smieci/trasy/edytuj/{{item.id}}" class="btn btn-warning-custom btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
+            </td>
+            <td class="fit">
+              <form method="post" action="/kierownik-przewozu-smieci/trasy/usun/{{item.id}}">
+                {% csrf_token %}
+                <button class="btn btn-danger-custom btn-md " tabindex="-1" role="submit" aria-disabled="true">Usuń</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

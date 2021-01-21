@@ -9,6 +9,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+def get_first_name(self):
+    return self.username
+
+
+User.add_to_class("__str__", get_first_name)
+
+
 class BinTrack(models.Model):
     id_bin_track = models.AutoField(primary_key=True)
     bin = models.ForeignKey('TrashBin', on_delete=models.SET_NULL, blank=True, null=True)
@@ -89,8 +96,10 @@ class InvoicesNames(models.Model):
 
 class Keys(models.Model):
     id_keys = models.AutoField(primary_key=True)
-    driver = models.ForeignKey(User, on_delete=models.SET_NULL, db_column='driver', related_name="driver", blank=True, null=True)
-    supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, db_column='supervisor', related_name="supervisor", blank=True, null=True)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, db_column='driver', related_name="driver", blank=True,
+                               null=True)
+    supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, db_column='supervisor', related_name="supervisor",
+                                   blank=True, null=True)
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, db_column='car_id', blank=True, null=True)
 
     class Meta:
@@ -113,9 +122,10 @@ class Schedule(models.Model):
 class Track(models.Model):
     id_track = models.AutoField(primary_key=True)
     arrival_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateField(blank=True, null=True)
     is_done = models.IntegerField(blank=True, null=True)
     car = models.ForeignKey(Cars, on_delete=models.SET_NULL, blank=True, null=True)
-    driver = models.IntegerField(blank=True, null=True)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, db_column='driver', blank=True, null=True)
     manager = models.IntegerField(blank=True, null=True)
     garbage_dump = models.ForeignKey(GarbageDump, on_delete=models.SET_NULL, blank=True, null=True)
 
