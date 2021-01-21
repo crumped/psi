@@ -1,10 +1,10 @@
-{% extends "../layout.html" %}
-{% block title %} Dodaj pojazd - kps {% endblock %}
+{% extends "../../layout.html" %}
+{% block title %} Dodaj przystanek - kps {% endblock %}
 {% block href%} /kierownik-przewozu-smieci {% endblock %}
 {% block content %}
 <div class="container-fluid">
 
-  <form class="row mt-5" method="post">
+  <form class="mt-5" method="post">
 
   {% csrf_token %}
   {% for field in form %}
@@ -15,7 +15,7 @@
     {% endfor %}
   <div class="col-12 mt-3">
 
-    <button type="submit" class="btn btn-success" style="float:right;">Dodaj pojazd</button>
+    <button type="submit" class="btn btn-success" style="float:right;">Dodaj przystanek</button>
 
   </div>
 </form>

@@ -112,12 +112,12 @@ def cars_kps(request):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         data = response.json()
-        return render(request, 'kierownik-przewozu-smieci/cars.html', {'data': data["results"]})
+        return render(request, 'kierownik-przewozu-smieci/cars/cars.html', {'data': data["results"]})
 
 
 def add_cars_kps(request):
     if request.method == 'GET':
-        return render(request, 'kierownik-przewozu-smieci/addcars.html')
+        return render(request, 'kierownik-przewozu-smieci/cars/addcars.html')
 
 
 def tracks_kps(request):
@@ -153,13 +153,19 @@ def add_track_kps(request):
             return redirect("/kierownik-przewozu-smieci/trasy")
 
 
-def edite_track_kps(request, id):
+def edit_track_kps(request, id):
     if request.method == 'GET':
         url = merge_url(request, "api/tracks/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         form = TrackForm(response.json())
-        return render(request, 'kierownik-przewozu-smieci/tracks/editetrack.html', {'form': form})
+
+        url = merge_url(request, "api/stops?track={id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        print(response.json())
+        data = response.json()
+        return render(request, 'kierownik-przewozu-smieci/tracks/edittrack.html', {'form': form, 'stops': data['results'], 'track_id': id})
     else:
         form = TrackForm(request.POST)
         if form.is_valid():
@@ -178,5 +184,59 @@ def edite_track_kps(request, id):
                 headers_dict = {"Authorization": "Token " + request.session['token']}
                 response = requests.get(url, headers=headers_dict)
                 form = TrackForm(response.json())
-                return render(request, 'kierownik-przewozu-smieci/tracks/addtrack.html', {'form': form})
+
+                url = merge_url(request, "api/stops?track={id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                print(response.json())
+                data = response.json()
+                return render(request, 'kierownik-przewozu-smieci/tracks/edittrack.html', {'form': form, 'stops': data['results'], 'track_id': id})
             return redirect("/kierownik-przewozu-smieci/trasy")
+
+
+def add_stop_kps(request, id):
+    if request.method == 'GET':
+        form = StopsForm()
+        return render(request, 'kierownik-przewozu-smieci/stops/addstop.html', {'form': form})
+    else:
+        form = StopsForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/stops")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "bin": form.data['bin'],
+                "stop_number": form.data['stop_number'],
+                "track": {id}
+            }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = StopsForm()
+                return render(request, 'kierownik-przewozu-smieci/tracks/addstop.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/trasy/edytuj/{id}".format(id=id))
+
+
+def edit_stop_kps(request, id, id2):
+    if request.method == 'GET':
+        url = merge_url(request, "api/stops/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        form = StopsForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form})
+    else:
+        form = StopsForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/stops/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "bin": form.data['bin'],
+                "stop_number": form.data['stop_number']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/stops/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = StopsForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/trasy/edytuj/{id}".format(id=id2))

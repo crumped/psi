@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group
 
 
 class BinTrackSerializer(serializers.ModelSerializer):
+    bin = serializers.SlugRelatedField(queryset=TrashBin.objects.all(), slug_field="address")
 
     class Meta:
         model = BinTrack

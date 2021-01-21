@@ -25,7 +25,7 @@ class BinTrack(models.Model):
     class Meta:
         managed = False
         db_table = 'bin_track'
-        ordering = ['id_bin_track']
+        ordering = ['stop_number']
 
 
 class CarType(models.Model):
@@ -145,3 +145,6 @@ class TrashBin(models.Model):
     class Meta:
         managed = False
         db_table = 'trash_bin'
+
+    def __str__(self):
+        return self.address

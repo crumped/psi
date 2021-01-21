@@ -1,0 +1,42 @@
+{% extends "../../layout.html" %}
+{% block title %} Edytuj trase - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+<div class="container-fluid">
+
+  <form class="row mt-5" method="post">
+      <div class="col-12 mt-3">
+          <button type="submit" class="btn btn-success" style="float:right;">Zapisz zmiany</button>
+      </div>
+  {% csrf_token %}
+      <div class="col-md-4">
+     {% for field in form %}
+        <label class="form-label whitetext" for="{{ field.auto_id }}">{{ field.label }}</label>
+        {{ field }}
+     {% endfor %}
+      </div>
+      <div class="col-md-8">
+          <a class="btn btn-success" href="/kierownik-przewozu-smieci/przystanki/dodaj/{{ track_id }}">Dodaj przystanek</a>
+          <h1 class="whitetext">Przystanki:</h1>
+          <div class="row mt-3">
+              {% for stop in stops %}
+              <div class="col-2 mb-4">
+                  <a href="/kierownik-przewozu-smieci/przystanki/edytuj/{{ stop.id_bin_track }}/{{ stop.track }}">
+                      <div class="card">
+                          <div class="card-header" style="color: #212529">Adress śmietnika: {{ stop.bin }}</div>
+                          <div class="card-body" style="color: #212529">Numer przystanku: {{ stop.stop_number }}</div>
+                      </div>
+                  </a>
+              </div>
+              {% endfor %}
+          </div>
+      </div>
+  <div class="col-12 mt-3">
+
+    <button type="submit" class="btn btn-success" style="float:right;">Zapisz zmiany</button>
+
+  </div>
+</form>
+
+</div>
+{% endblock %}

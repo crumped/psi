@@ -43,3 +43,11 @@ class TrackForm(forms.Form):
                                     widget=forms.Select(attrs={'class': 'form-select'}))
     start_date = forms.DateField(widget=forms.DateInput(attrs={
         'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia', 'value': datetime.date.today}))
+
+
+class StopsForm(forms.Form):
+    bin = forms.ModelChoiceField(label='Pojemnik na śmieci', queryset=TrashBin.objects.all(), to_field_name="address", initial=0, widget=forms.Select(
+        attrs={'class': 'form-select'}))
+    stop_number = forms.IntegerField(label='Numer przystanku', widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+
