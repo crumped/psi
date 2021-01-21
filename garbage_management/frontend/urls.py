@@ -25,6 +25,11 @@ urlpatterns = [
     path('kierownik-przewozu-smieci/przystanki/dodaj/<int:id>', add_stop_kps, name="add stop kps"),
     path('kierownik-przewozu-smieci/przystanki/edytuj/<int:id>/<int:id2>', edit_stop_kps, name="edit stop kps"),
 
+    path('kierownik-przewozu-smieci/grafik', schedule_kps, name="schedule kps"),
+    path('kierownik-przewozu-smieci/grafik/dodaj', add_schedule_kps, name="add schedule kps"),
+    path('kierownik-przewozu-smieci/grafik/edytuj/<int:id>', edit_schedule_kps, name="edit user kps"),
+    path('kierownik-przewozu-smieci/grafik/usun/<int:id>', delete_schedule_kps, name="delete user kps"),
+
     path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/dodaj', add_user_kps, name="add user kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', delete_user_kps, name="delete user kps"),
