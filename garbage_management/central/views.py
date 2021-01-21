@@ -400,12 +400,34 @@ class ScheduleList(generics.ListCreateAPIView):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
     name = 'schedule-list'
+    filter_fields = ['user__username', 'day']
+    search_fields = ['user__username', 'day']
+    ordering = ['user', 'day']
     permission_classes = [IsAuthenticated, HasGroupPermission]
     required_groups = {
         'GET': ['kierowca-smieciarki', 'pracownik-wysypiska', 'pracownicy-przewozacy-smieci', 'kierownik-wysypiska',
                 'kierownik-przewozu-smieci'],
         'POST': ['kierownik-wysypiska', 'kierownik-przewozu-smieci'],
     }
+
+    def get_queryset(self):
+        """Filter active products."""
+        current_user = User.objects.all().filter(username=self.request.user).first()
+        serializer = UserSerializer(current_user)
+        if 'szef' in serializer.data['groups']:
+            return self.queryset.filter(user__is_superuser=False, )
+
+        if 'kierownik-glowny' in serializer.data['groups']:
+            exclude_array = ['szef']
+            return self.queryset.filter(user__is_superuser=False).exclude(user__groups__name__in=exclude_array)
+
+        if 'kierownik-przewozu-smieci' in serializer.data['groups']:
+            include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+            return self.queryset.filter(user__is_superuser=False, user__groups__name__in=include_array)
+
+        if 'kierownik-wysypiska' in serializer.data['groups']:
+            include_array = ['pracownik-wysypiska']
+            return self.queryset.filter(user__is_superuser=False, user__groups__name__in=include_array)
 
 
 class ScheduleDetail(generics.RetrieveUpdateDestroyAPIView):

@@ -1,0 +1,53 @@
+{% extends "../../layout.html" %}
+{% block title %} Grafik - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+<div class="col-10 mx-auto mt-5">
+    <div class="col-3 mt-5 mb-3">
+        <form>
+            <div class="input-group">
+                <input type="search" name="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+                       aria-describedby="search-addon" />
+                <button type="submit" class="btn btn-primary">search</button>
+            </div>
+        </form>
+    </div>
+    <div style="float: right;" class="mt-5 mb-3">
+        <a href="/kierownik-przewozu-smieci/grafik/dodaj" class="btn btn btn-success btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj zmianę</a>
+    </div>
+<table class="table table-secondary table-hover">
+   <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Dzień pracy</th>
+        <th scope="col">Zmiana</th>
+        <th scope="col">Użytkownik</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+      <tr>
+        <td>{{ item.id_schedule }}</td>
+        <td>{{ item.day }}</td>
+        <td>{{ item.work_type }}</td>
+        <td>{{ item.user }}</td>
+        <td class="fit">
+          <a href="/kierownik-przewozu-smieci/grafik/edytuj/{{item.id_schedule}}" class="btn btn btn-warning btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
+        </td>
+        <td class="fit">
+          <form method="post" action="/kierownik-przewozu-smieci/grafik/usun/{{item.id_schedule}}">
+            {% csrf_token %}
+            <button class="btn btn btn-danger btn-md " tabindex="-1" role="submit" aria-disabled="true">Usuń</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+{% endblock %}

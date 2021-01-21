@@ -90,3 +90,13 @@ class TrashBinForm(forms.Form):
                                                                                           'placeholder': 'Adres'}))
     bin_size = forms.CharField(label="Rozmiar pojemnika", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                           'placeholder': 'Rozmiar pojemnika'}))
+class ScheduleForm(forms.Form):
+    include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
+    user = forms.ModelChoiceField(label='Pracownik', queryset=User.objects.all()
+                                    .filter(groups__name__in=include_array), to_field_name="username", initial=0,
+                                    widget=forms.Select(attrs={'class': 'form-select'}))
+    day = forms.DateField(label='Dzień pracy', widget=forms.DateInput(attrs={
+        'class': 'form-control', 'placeholder': 'Dzień pracy', 'value': datetime.date.today}))
+    CHOICES = (('Noc', 'Noc'), ('Dzień', 'Dzień'), ('Ranek', 'Ranek'), ('Wieczór', 'Wieczór'))
+    work_type = forms.ChoiceField(label='Typ zmiany', choices=CHOICES, widget=forms.Select(
+        attrs={'class': 'form-select'}))
