@@ -117,8 +117,25 @@ def cars_kps(request):
 
 def add_cars_kps(request):
     if request.method == 'GET':
-        return render(request, 'kierownik-przewozu-smieci/cars/addcars.html')
-
+        form = CarsForm()
+        return render(request, 'kierownik-przewozu-smieci/cars/addcars.html', {'form': form})
+    else:
+        form = CarsForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/cars")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {"number_plate": form.data['number_plate'],
+                      "mileage": form.data['mileage'],
+                      "date_oil": form.data['date_oil'],
+                      "mileage_oil": form.data['mileage_oil'],
+                      "car_type": form.data['car_type']
+                      }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = CarsForm()
+                return render(request, 'kierownik-przewozu-smieci/cars/addcars.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/pojazdy")
 
 def tracks_kps(request):
     if request.method == 'GET':
@@ -240,3 +257,41 @@ def edit_stop_kps(request, id, id2):
                 form = StopsForm(response.json())
                 return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form})
             return redirect("/kierownik-przewozu-smieci/trasy/edytuj/{id}".format(id=id2))
+
+
+def edit_car_kps(request, id):
+    if request.method == 'GET':
+        url = merge_url(request, "api/cars/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        form = CarsForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/cars/edit.html', {'form': form, 'car_id': id})
+    else:
+        form = CarsForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/cars/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                      "number_plate": form.data['number_plate'],
+                      "mileage": form.data['mileage'],
+                      "date_oil": form.data['date_oil'],
+                      "mileage_oil": form.data['mileage_oil'],
+                      "car_type": form.data['car_type']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/cars/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = CarsForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/cars/edit.html',
+                              {'form': form, 'car_id': id})
+            return redirect("/kierownik-przewozu-smieci/pojazdy")
+
+
+def delete_car_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/cars/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        return redirect('/kierownik-przewozu-smieci/pojazdy')

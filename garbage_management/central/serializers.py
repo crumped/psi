@@ -21,6 +21,7 @@ class CarTypeSerializer(serializers.ModelSerializer):
 
 
 class CarsSerializer(serializers.ModelSerializer):
+    car_type = serializers.SlugRelatedField(queryset=CarType.objects.all(), slug_field="type")
 
     class Meta:
         model = Cars

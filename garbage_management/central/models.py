@@ -36,6 +36,9 @@ class CarType(models.Model):
         managed = False
         db_table = 'car_type'
 
+    def __str__(self):
+        return self.type
+
 
 class Cars(models.Model):
     id_cars = models.AutoField(primary_key=True)
