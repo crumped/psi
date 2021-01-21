@@ -39,7 +39,7 @@ class TrackForm(forms.Form):
     is_done = forms.ChoiceField(label='Czy zrealizowane', choices=CHOICES, widget=forms.Select(
         attrs={'class': 'form-select'}))
     driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
-                                    .filter(groups__name='kierowca-smieciarki'), initial=0, widget=forms.Select(
-        attrs={'class': 'form-select'}))
-    start_date = forms.DateField(initial=datetime.date.today, widget=forms.TextInput(attrs={
-        'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia'}))
+                                    .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
+                                    widget=forms.Select(attrs={'class': 'form-select'}))
+    start_date = forms.DateField(widget=forms.DateInput(attrs={
+        'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia', 'value': datetime.date.today}))

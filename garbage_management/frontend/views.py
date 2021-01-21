@@ -68,7 +68,6 @@ def users_kps(request):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         data = response.json()
-        print(data)
         return render(request, 'kierownik-przewozu-smieci/users/users.html', {'data': data["results"]})
 
 
@@ -78,7 +77,6 @@ def places_kps(request):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         data = response.json()
-        print(data)
         return render(request, 'kierownik-przewozu-smieci/places/places.html', {'data': data["results"]})
 
 
@@ -105,9 +103,6 @@ def delete_user_kps(request, id):
         url = merge_url(request, "api/users/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.delete(url, headers=headers_dict)
-        print(response)
-        print(response.status_code)
-        # return users_kps(request)
         return redirect('/kierownik-przewozu-smieci/uzytkownicy')
 
 
@@ -117,7 +112,6 @@ def cars_kps(request):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         data = response.json()
-        print(data)
         return render(request, 'kierownik-przewozu-smieci/cars.html', {'data': data["results"]})
 
 
@@ -132,7 +126,6 @@ def tracks_kps(request):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         data = response.json()
-        print(data)
         return render(request, 'kierownik-przewozu-smieci/tracks/tracks.html', {'data': data["results"]})
 
 
@@ -160,16 +153,30 @@ def add_track_kps(request):
             return redirect("/kierownik-przewozu-smieci/trasy")
 
 
-def edite_track_kps(request):
-    return 0
-
-
-def delete_track_kps(request, id):
-    if request.method == "POST":
+def edite_track_kps(request, id):
+    if request.method == 'GET':
         url = merge_url(request, "api/tracks/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
-        response = requests.delete(url, headers=headers_dict)
-        print(response)
-        print(response.status_code)
-        # return users_kps(request)
-        return redirect('/kierownik-przewozu-smieci/trasy')
+        response = requests.get(url, headers=headers_dict)
+        form = TrackForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/tracks/editetrack.html', {'form': form})
+    else:
+        form = TrackForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/tracks/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "car": form.data['car'],
+                "garbage_dump": form.data['garbage_dump'],
+                "start_date": form.data['start_date'],
+                "is_done": form.data['is_done'],
+                "driver": form.data['driver']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/tracks/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = TrackForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/tracks/addtrack.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/trasy")

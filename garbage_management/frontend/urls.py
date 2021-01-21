@@ -21,7 +21,6 @@ urlpatterns = [
     path('kierownik-przewozu-smieci/trasy', tracks_kps, name="tracks kps"),
     path('kierownik-przewozu-smieci/trasy/dodaj', add_track_kps, name="add track kps"),
     path('kierownik-przewozu-smieci/trasy/edytuj/<int:id>', edite_track_kps, name="edite track kps"),
-    path('kierownik-przewozu-smieci/trasy/usun/<int:id>', delete_track_kps, name="delete track kps"),
 
     path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/dodaj', add_user_kps, name="add user kps"),
