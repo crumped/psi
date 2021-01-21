@@ -97,7 +97,7 @@ class TrashBinSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    groups = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
+    groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
 
     class Meta:
         model = User

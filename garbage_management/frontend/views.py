@@ -111,22 +111,21 @@ def edit_user_kps(request, id):
         url = merge_url(request, "api/users/{id}".format(id=id))
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
-        form = AddUserForm(response.json())
+        form = EditUserForm(response.json())
         return render(request, 'kierownik-przewozu-smieci/users/edituser.html', {'form': form})
     else:
-        form = AddUserForm(request.POST)
+        form = EditUserForm(request.POST)
         if form.is_valid():
             url = merge_url(request, "api/users/{id}".format(id=id))
             headers_dict = {"Authorization": "Token " + request.session['token']}
             my_obj = {"username": form.data['username'], "first_name": form.data['first_name'],
-                      "last_name": form.data['last_name'], "email": form.data['email'], "groups": form.data['groups'],
-                      "password": form.data['password']}
+                      "last_name": form.data['last_name'], "email": form.data['email'], "groups": [form.data['groups']]}
             response = requests.put(url, data=my_obj, headers=headers_dict)
             if response.status_code == 404 or response.status_code == 400:
                 url = merge_url(request, "api/users/{id}".format(id=id))
                 headers_dict = {"Authorization": "Token " + request.session['token']}
                 response = requests.get(url, headers=headers_dict)
-                form = AddUserForm(response.json())
+                form = EditUserForm(response.json())
 
                 return render(request, 'kierownik-przewozu-smieci/users/edituser.html',
                               {'form': form})
