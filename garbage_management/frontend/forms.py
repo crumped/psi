@@ -18,16 +18,16 @@ class AddUserForm(forms.Form):
         'class': 'form-control', 'placeholder': 'Nazwa użytkownika'}))
     password = forms.CharField(label="Hasło", widget=forms.PasswordInput(attrs={'class': 'form-control',
                                                                                 'placeholder': 'Hasło'}))
-    firstname = forms.CharField(label="Imię", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
+    first_name = forms.CharField(label="Imię", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                             'placeholder': 'Imię'}))
-    lastname = forms.CharField(label="Nazwisko", max_length=100, widget=forms.TextInput(attrs={
+    last_name = forms.CharField(label="Nazwisko", max_length=100, widget=forms.TextInput(attrs={
         'class': 'form-control', 'placeholder': 'Nazwisko'}))
-    adress = forms.CharField(label="Adres", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
-                                                                                          'placeholder': 'Adres'}))
+    email = forms.CharField(label="Email", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                                          'placeholder': 'Email'}))
     CHOICES = (
         ('kierowca-smieciarki', 'Kierowca Śmieciarki'), ('pracownicy-przewozacy-smieci', 'Pracownik Śmieciarki')
     )
-    group = forms.ChoiceField(label="Stanowisko", choices=CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
+    groups = forms.ChoiceField(label="Stanowisko", choices=CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
 
 
 class CarsForm(forms.Form):

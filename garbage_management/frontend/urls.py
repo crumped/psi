@@ -35,6 +35,7 @@ urlpatterns = [
     path('kierownik-przewozu-smieci/uzytkownicy', users_kps, name="users kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/dodaj', add_user_kps, name="add user kps"),
     path('kierownik-przewozu-smieci/uzytkownicy/usun/<int:id>', delete_user_kps, name="delete user kps"),
+    path('kierownik-przewozu-smieci/uzytkownicy/edytuj/<int:id>', edit_user_kps, name="edit user kps"),
 
     path('kierownik-wysypiska', login, name="login"),
 
