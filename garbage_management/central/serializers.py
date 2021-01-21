@@ -68,6 +68,7 @@ class InvoicesSerializer(serializers.ModelSerializer):
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field="username")
 
     class Meta:
         model = Schedule

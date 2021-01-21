@@ -295,3 +295,73 @@ def delete_car_kps(request, id):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.delete(url, headers=headers_dict)
         return redirect('/kierownik-przewozu-smieci/pojazdy')
+
+
+def schedule_kps(request):
+    if request.method == 'GET':
+        search = request.GET.get('search', '')
+        if search != "":
+            url = merge_url(request, "api/schedule?search={search}".format(search=search))
+        else:
+            url = merge_url(request, "api/schedule")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        return render(request, 'kierownik-przewozu-smieci/schedule/schedule.html', {'data': data["results"]})
+
+
+def add_schedule_kps(request):
+    if request.method == 'GET':
+        form = ScheduleForm()
+        return render(request, 'kierownik-przewozu-smieci/schedule/addschedule.html', {'form': form})
+    else:
+        form = ScheduleForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/schedule")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "user": form.data['user'],
+                "day": form.data['day'],
+                "work_type": form.data['work_type']
+            }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = ScheduleForm()
+                return render(request, 'kierownik-przewozu-smieci/schedule/addschedule.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/grafik")
+
+
+def edit_schedule_kps(request, id):
+    if request.method == 'GET':
+        url = merge_url(request, "api/schedule/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        form = ScheduleForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/schedule/editschedule.html', {'form': form})
+    else:
+        form = ScheduleForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/schedule/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "user": form.data['user'],
+                "day": form.data['day'],
+                "work_type": form.data['work_type']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/schedule/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = ScheduleForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/schedule/editschedule.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/grafik")
+
+
+def delete_schedule_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/schedule/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        return redirect('/kierownik-przewozu-smieci/grafik')
