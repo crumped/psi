@@ -99,3 +99,15 @@ class ScheduleForm(forms.Form):
     CHOICES = (('Noc', 'Noc'), ('Dzień', 'Dzień'), ('Ranek', 'Ranek'), ('Wieczór', 'Wieczór'))
     work_type = forms.ChoiceField(label='Typ zmiany', choices=CHOICES, widget=forms.Select(
         attrs={'class': 'form-select'}))
+
+
+class KeysForm(forms.Form):
+    driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
+                                    .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
+                                    widget=forms.Select(attrs={'class': 'form-select'}))
+    supervisor = forms.ModelChoiceField(label='Nadzorca', queryset=User.objects.all() , to_field_name="username",
+                                        initial=0, widget=forms.Select(attrs={'class': 'form-select'}))
+    car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
+                                 widget=forms.Select(attrs={'class': 'form-select'}))
+
+

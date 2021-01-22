@@ -18,6 +18,11 @@ urlpatterns = [
     path('kierownik-przewozu-smieci/pojazdy/edytuj/<int:id>', edit_car_kps, name="edit car kps"),
     path('kierownik-przewozu-smieci/pojazdy/usun/<int:id>', delete_car_kps, name="delete car kps"),
 
+    path('kierownik-przewozu-smieci/przekazaniePojazdu', keys_kps, name="keys kps"),
+    path('kierownik-przewozu-smieci/przekazaniePojazdu/dodaj', add_keys_kps, name="add keys kps"),
+    path('kierownik-przewozu-smieci/przekazaniePojazdu/edytuj/<int:id>', edit_keys_kps, name="edit keys kps"),
+    path('kierownik-przewozu-smieci/przekazaniePojazdu/usun/<int:id>', delete_keys_kps, name="delete keys kps"),
+
     path('kierownik-przewozu-smieci/miejscaRozladunku', places_kps, name="places kps"),
 
     path('kierownik-przewozu-smieci/trasy', tracks_kps, name="tracks kps"),

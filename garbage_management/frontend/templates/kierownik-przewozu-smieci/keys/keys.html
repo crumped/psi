@@ -1,0 +1,46 @@
+{% extends "../../layout.html" %}
+{% block title %} Klucze - kps {% endblock %}
+{% block href%} /kierownik-przewozu-smieci {% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+
+<div class="col-10 mx-auto">
+  <div style="float: right;" class="mt-5 mb-3">
+    <a href="/kierownik-przewozu-smieci/przekazaniePojazdu/dodaj" class="btn btn btn-success btn-md " tabindex="-1" role="button" aria-disabled="true">Dodaj przekazanie</a>
+  </div>
+<table class="table table-striped table-light table-hover">
+   <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Kierowca</th>
+      <th scope="col">Nadzorca</th>
+      <th scope="col">Pojazd</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+      <tr>
+        <td>{{ item.id_keys }}</td>
+        <td>{{ item.driver }}</td>
+        <td>{{ item.supervisor }}</td>
+        <td>{{ item.car }}</td>
+        <td class="fit">
+          <a href="/kierownik-przewozu-smieci/przekazaniePojazdu/edytuj/{{item.id_keys}}" class="btn btn btn-warning btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
+        </td>
+        <td class="fit">
+          <form method="post" action="/kierownik-przewozu-smieci/przekazaniePojazdu/usun/{{item.id_keys}}">
+            {% csrf_token %}
+            <button class="btn btn btn-danger btn-md " tabindex="-1" role="submit" aria-disabled="true">Usuń</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+
+{% endblock %}
