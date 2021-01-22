@@ -14,6 +14,7 @@
           <th scope="col">ID</th>
           <th scope="col">Imię</th>
           <th scope="col">Nazwisko</th>
+          <th scope="col">Nazwa użytkownika</th>
           <th scope="col">Stanowisko</th>
           <th scope="col"></th>
           <th scope="col"></th>
@@ -25,6 +26,7 @@
             <td>{{ item.id }}</td>
             <td>{{ item.first_name }}</td>
             <td>{{ item.last_name }}</td>
+            <td>{{ item.username }}</td>
             <td>{% if item.groups.0 == 'pracownicy-przewozacy-smieci' %} Pomocnik Kierowcy {% endif %}{% if item.groups.0 == 'kierowca-smieciarki' %} Kierowca {% endif %}</td>
             <td class="fit">
               <a href="/kierownik-przewozu-smieci/uzytkownicy/edytuj/{{item.id}}" class="btn btn-warning-custom btn-md " tabindex="-1" role="button" aria-disabled="true">Edytuj</a>
