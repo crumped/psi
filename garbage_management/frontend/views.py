@@ -241,7 +241,13 @@ def edit_track_kps(request, id):
 def add_stop_kps(request, id):
     if request.method == 'GET':
         form = StopsForm()
-        return render(request, 'kierownik-przewozu-smieci/stops/addstop.html', {'form': form})
+
+        url = merge_url(request, "api/trash-bins".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+        return render(request, 'kierownik-przewozu-smieci/stops/addstop.html', {'form': form, 'data': data['results']})
     else:
         form = StopsForm(request.POST)
         if form.is_valid():
@@ -256,7 +262,7 @@ def add_stop_kps(request, id):
             data = response.json()
             if response.status_code == 404 or response.status_code == 400:
                 form = StopsForm()
-                return render(request, 'kierownik-przewozu-smieci/tracks/addstop.html', {'form': form})
+                return render(request, 'kierownik-przewozu-smieci/stops/addstop.html', {'form': form})
             return redirect("/kierownik-przewozu-smieci/trasy/edytuj/{id}".format(id=id))
 
 
@@ -266,7 +272,14 @@ def edit_stop_kps(request, id, id2):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.get(url, headers=headers_dict)
         form = StopsForm(response.json())
-        return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form})
+
+        url = merge_url(request, "api/trash-bins".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        print(data)
+
+        return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form, 'data': data['results']})
     else:
         form = StopsForm(request.POST)
         if form.is_valid():
@@ -282,7 +295,13 @@ def edit_stop_kps(request, id, id2):
                 headers_dict = {"Authorization": "Token " + request.session['token']}
                 response = requests.get(url, headers=headers_dict)
                 form = StopsForm(response.json())
-                return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form})
+
+                url = merge_url(request, "api/trash-bins".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                data = response.json()
+                print(data)
+                return render(request, 'kierownik-przewozu-smieci/stops/editstop.html', {'form': form, 'data': data['results']})
             return redirect("/kierownik-przewozu-smieci/trasy/edytuj/{id}".format(id=id2))
 
 
@@ -390,7 +409,6 @@ def edit_trash_bin_kps(request, id):
                 return render(request, 'kierownik-przewozu-smieci/trash_bins/edit.html',
                               {'form': form, 'trash-bins_id': id})
             return redirect("/kierownik-przewozu-smieci/pojemniki")
-
 
 
 def schedule_kps(request):

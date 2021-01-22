@@ -149,5 +149,3 @@ class TrashBin(models.Model):
         managed = False
         db_table = 'trash_bin'
 
-    def __str__(self):
-        return self.address

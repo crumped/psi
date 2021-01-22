@@ -3,7 +3,6 @@ import datetime
 from django import forms
 from central.models import *
 from django.contrib.auth.models import User
-# from garbage_management.central.models import *
 
 
 class LoginForm(forms.Form):
@@ -74,7 +73,7 @@ class TrackForm(forms.Form):
 
 
 class StopsForm(forms.Form):
-    bin = forms.ModelChoiceField(label='Pojemnik na śmieci', queryset=TrashBin.objects.all(), to_field_name="address", initial=0, widget=forms.Select(
+    bin = forms.ModelChoiceField(label='Pojemnik na śmieci', queryset=TrashBin.objects.all(), initial=0, widget=forms.Select(
         attrs={'class': 'form-select'}))
     stop_number = forms.IntegerField(label='Numer przystanku', widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
@@ -89,6 +88,8 @@ class TrashBinForm(forms.Form):
                                                                                           'placeholder': 'Adres'}))
     bin_size = forms.CharField(label="Rozmiar pojemnika", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                           'placeholder': 'Rozmiar pojemnika'}))
+
+
 class ScheduleForm(forms.Form):
     include_array = ['kierowca-smieciarki', 'pracownicy-przewozacy-smieci']
     user = forms.ModelChoiceField(label='Pracownik', queryset=User.objects.all()
@@ -109,5 +110,3 @@ class KeysForm(forms.Form):
                                         initial=0, widget=forms.Select(attrs={'class': 'form-select'}))
     car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
                                  widget=forms.Select(attrs={'class': 'form-select'}))
-
-

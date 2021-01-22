@@ -4,15 +4,33 @@
 {% block content %}
 <div class="container-fluid">
 
-  <form class="mt-5" method="post">
+  <form class="row mt-5" method="post">
 
   {% csrf_token %}
+      <div class="col-md-4">
   {% for field in form %}
-    <div class="col-md-4">
         <label class="form-label whitetext" for="{{ field.auto_id }}">{{ field.label }}</label>
         {{ field }}
-    </div>
     {% endfor %}
+      </div>
+    <div class="col-md-2">
+      </div>
+      <div class="col-md-4">
+          <div class="panel panel-primary" id="result_panel">
+              <div class="panel-heading"><h3 class="panel-title">Lista pojemników</h3>
+              </div>
+              <div class="panel-body">
+                  <ul class="list-group" style="overflow:hidden; overflow-y:scroll; max-height: 50vh;">
+                      {% for item in data %}
+                      <li class="list-group-item"><strong>ID</strong> {{ item.id_trash_bin }}<br> <strong>Adres</strong> {{ item.address }}<br> <strong>Rodzaj</strong> {{ item.bin_type }}
+                      </li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-2">
+      </div>
   <div class="col-12 mt-3">
 
     <button type="submit" class="btn btn-success" style="float:right;">Dodaj przystanek</button>
