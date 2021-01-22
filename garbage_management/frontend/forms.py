@@ -105,7 +105,7 @@ class KeysForm(forms.Form):
     driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
                                     .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
                                     widget=forms.Select(attrs={'class': 'form-select'}))
-    supervisor = forms.ModelChoiceField(label='Nadzorca', queryset=User.objects.all() , to_field_name="username",
+    supervisor = forms.ModelChoiceField(label='Nadzorca', queryset=User.objects.all().filter(groups__name='kierownik-przewozu-smieci'), to_field_name="username",
                                         initial=0, widget=forms.Select(attrs={'class': 'form-select'}))
     car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
                                  widget=forms.Select(attrs={'class': 'form-select'}))
