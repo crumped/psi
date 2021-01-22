@@ -50,7 +50,7 @@ class CarsForm(forms.Form):
                                                                                           'placeholder': 'Numer rejestracyjny'}))
     mileage = forms.CharField(label="Przebieg", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                           'placeholder': 'Przebieg'}))
-    date_oil = forms.DateField(widget=forms.DateInput(attrs={
+    date_oil = forms.DateField(label="Data zmiany oleju", widget=forms.DateInput(attrs={
         'class': 'form-control', 'placeholder': 'Data zmiany oleju', 'value': datetime.date.today}))
     mileage_oil = forms.CharField(label="Ilość kilometrów do zrobienia", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control',
                                                                                           'placeholder': 'Ilość kilometrów do zrobienia'}))
@@ -69,7 +69,7 @@ class TrackForm(forms.Form):
     driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
                                     .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
                                     widget=forms.Select(attrs={'class': 'form-select'}))
-    start_date = forms.DateField(widget=forms.DateInput(attrs={
+    start_date = forms.DateField(label="Data kursu",widget=forms.DateInput(attrs={
         'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia', 'value': datetime.date.today}))
 
 
@@ -107,7 +107,7 @@ class KeysForm(forms.Form):
                                     widget=forms.Select(attrs={'class': 'form-select'}))
     supervisor = forms.ModelChoiceField(label='Nadzorca', queryset=User.objects.all().filter(groups__name='kierownik-przewozu-smieci'), to_field_name="username",
                                         initial=0, widget=forms.Select(attrs={'class': 'form-select'}))
-    car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
+    car = forms.ModelChoiceField(label='Pojazd', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
                                  widget=forms.Select(attrs={'class': 'form-select'}))
 
 
