@@ -58,22 +58,6 @@ class TrackForm(forms.Form):
         'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia', 'value': datetime.date.today}))
 
 
-
-class TrackForm(forms.Form):
-    car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0, widget=forms.Select(
-        attrs={'class': 'form-select'}))
-    garbage_dump = forms.ModelChoiceField(label='Miejsce rozładunku', queryset=GarbageDump.objects.all(), to_field_name="address", initial=0,
-                                          widget=forms.Select(attrs={'class': 'form-select'}))
-    CHOICES = (('0', 'Nie'), ('1', 'Tak'),)
-    is_done = forms.ChoiceField(label='Czy zrealizowane', choices=CHOICES, widget=forms.Select(
-        attrs={'class': 'form-select'}))
-    driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
-                                    .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
-                                    widget=forms.Select(attrs={'class': 'form-select'}))
-    start_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control', 'placeholder': 'Dzień rozpoczęcia', 'value': datetime.date.today}))
-
-
 class StopsForm(forms.Form):
     bin = forms.ModelChoiceField(label='Pojemnik na śmieci', queryset=TrashBin.objects.all(), to_field_name="address", initial=0, widget=forms.Select(
         attrs={'class': 'form-select'}))
@@ -90,3 +74,15 @@ class ScheduleForm(forms.Form):
     CHOICES = (('Noc', 'Noc'), ('Dzień', 'Dzień'), ('Ranek', 'Ranek'), ('Wieczór', 'Wieczór'))
     work_type = forms.ChoiceField(label='Typ zmiany', choices=CHOICES, widget=forms.Select(
         attrs={'class': 'form-select'}))
+
+
+class KeysForm(forms.Form):
+    driver = forms.ModelChoiceField(label='Kierowca', queryset=User.objects.all()
+                                    .filter(groups__name='kierowca-smieciarki'), to_field_name="username", initial=0,
+                                    widget=forms.Select(attrs={'class': 'form-select'}))
+    supervisor = forms.ModelChoiceField(label='Nadzorca', queryset=User.objects.all() , to_field_name="username",
+                                        initial=0, widget=forms.Select(attrs={'class': 'form-select'}))
+    car = forms.ModelChoiceField(label='Samochód', queryset=Cars.objects.all(), to_field_name="number_plate", initial=0,
+                                 widget=forms.Select(attrs={'class': 'form-select'}))
+
+

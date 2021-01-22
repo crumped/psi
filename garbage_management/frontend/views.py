@@ -165,6 +165,7 @@ def add_cars_kps(request):
                 return render(request, 'kierownik-przewozu-smieci/cars/addcars.html', {'form': form})
             return redirect("/kierownik-przewozu-smieci/pojazdy")
 
+
 def tracks_kps(request):
     if request.method == 'GET':
         url = merge_url(request, "api/tracks")
@@ -393,3 +394,69 @@ def delete_schedule_kps(request, id):
         headers_dict = {"Authorization": "Token " + request.session['token']}
         response = requests.delete(url, headers=headers_dict)
         return redirect('/kierownik-przewozu-smieci/grafik')
+
+
+def keys_kps(request):
+    if request.method == 'GET':
+        url = merge_url(request, "api/keys")
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        data = response.json()
+        return render(request, 'kierownik-przewozu-smieci/keys/keys.html', {'data': data["results"]})
+
+
+def add_keys_kps(request):
+    if request.method == 'GET':
+        form = KeysForm()
+        return render(request, 'kierownik-przewozu-smieci/keys/addkeys.html', {'form': form})
+    else:
+        form = KeysForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/keys")
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "driver": form.data['driver'],
+                "supervisor": form.data['supervisor'],
+                "car": form.data['car']
+            }
+            response = requests.post(url, data=my_obj, headers=headers_dict)
+            data = response.json()
+            if response.status_code == 404 or response.status_code == 400:
+                form = KeysForm()
+                return render(request, 'kierownik-przewozu-smieci/keys/addkeys.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/przekazaniePojazdu")
+
+
+def edit_keys_kps(request, id):
+    if request.method == 'GET':
+        url = merge_url(request, "api/keys/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.get(url, headers=headers_dict)
+        form = KeysForm(response.json())
+        return render(request, 'kierownik-przewozu-smieci/keys/editkeys.html', {'form': form})
+    else:
+        form = KeysForm(request.POST)
+        if form.is_valid():
+            url = merge_url(request, "api/keys/{id}".format(id=id))
+            headers_dict = {"Authorization": "Token " + request.session['token']}
+            my_obj = {
+                "driver": form.data['driver'],
+                "supervisor": form.data['supervisor'],
+                "car": form.data['car']
+            }
+            response = requests.put(url, data=my_obj, headers=headers_dict)
+            if response.status_code == 404 or response.status_code == 400:
+                url = merge_url(request, "api/keys/{id}".format(id=id))
+                headers_dict = {"Authorization": "Token " + request.session['token']}
+                response = requests.get(url, headers=headers_dict)
+                form = KeysForm(response.json())
+                return render(request, 'kierownik-przewozu-smieci/keys/editkeys.html', {'form': form})
+            return redirect("/kierownik-przewozu-smieci/przekazaniePojazdu")
+
+
+def delete_keys_kps(request, id):
+    if request.method == "POST":
+        url = merge_url(request, "api/keys/{id}".format(id=id))
+        headers_dict = {"Authorization": "Token " + request.session['token']}
+        response = requests.delete(url, headers=headers_dict)
+        return redirect('/kierownik-przewozu-smieci/przekazaniePojazdu')
