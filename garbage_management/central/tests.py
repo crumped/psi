@@ -25,8 +25,10 @@ class CarsTests(TestCase):
         self.client.login(username='kps', password='test')
 
     def test_create_car(self):
+        CarType.objects.create(type="szkło")
         url = '/api/cars'
         data = {
+            "car_type": "szkło",
             "number_plate": "Nol 1515",
             "mileage": 2545454,
             "date_oil": "2020-01-15",
